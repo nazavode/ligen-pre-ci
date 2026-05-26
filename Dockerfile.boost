@@ -1,0 +1,12 @@
+FROM base
+ARG BOOST_URL
+ARG BOOST_URL_CHECKSUM
+
+RUN aria2c --checksum="${BOOST_URL_CHECKSUM}" -d /tmp -o boost.archive "${BOOST_URL}" \
+ && mkdir -p /tmp/boost.src \
+ && tar xf /tmp/boost.archive -C /tmp/boost.src/ --strip-components 1 \
+ && cd /tmp/boost.src \
+ && ./bootstrap.sh --with-toolset=gcc --with-libraries=graph,program_options \
+ && ./b2 cxxstd=17 toolset=gcc --with-graph --with-program_options stage \
+ && ./b2 cxxstd=17 toolset=gcc --with-graph --with-program_options --prefix=/opt/boost install \
+ && rm -rf /tmp/*

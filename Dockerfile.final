@@ -1,0 +1,8 @@
+FROM base
+
+COPY --from=cmake-builder /opt/cmake/ /usr/
+COPY --from=boost-builder /opt/boost/ /usr/
+
+ENV CC=gcc  \
+    CXX=g++ \
+    FC=gfortran

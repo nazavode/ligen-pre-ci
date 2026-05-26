@@ -1,0 +1,18 @@
+# ==========================================
+# Ubuntu 22.04
+# ==========================================
+FROM ubuntu:22.04 AS ubuntu
+
+RUN apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+      aria2 gcc g++ make tar ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+# ==========================================
+# RHEL 9
+# ==========================================
+FROM registry.access.redhat.com/ubi9/ubi AS rhel
+
+RUN dnf install -y \
+      aria2 gcc gcc-c++ make tar \
+ && dnf clean all
