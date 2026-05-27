@@ -27,10 +27,10 @@ group "default" {
   targets = ["final"]
 }
 
-# Generates: base-ubuntu and base-rhel
+# Generates: base-debian and base-rhel
 target "base" {
   matrix = {
-    os = ["ubuntu", "rhel"]
+    os = ["debian", "rhel"]
   }
   name       = "base-${os}"
   dockerfile = "Dockerfile.base"
@@ -43,7 +43,7 @@ target "base" {
 
 target "mkl" {
   matrix = {
-    os = ["ubuntu", "rhel"]
+    os = ["debian", "rhel"]
   }
   name   = "mkl-${os}"
   dockerfile = "Dockerfile.mkl"
@@ -56,10 +56,10 @@ target "mkl" {
   }
 }
 
-# Generates: cmake-ubuntu and cmake-rhel
+# Generates: cmake-debian and cmake-rhel
 target "cmake" {
   matrix = {
-    os = ["ubuntu", "rhel"]
+    os = ["debian", "rhel"]
   }
   name       = "cmake-${os}"
   dockerfile = "Dockerfile.cmake"
@@ -72,10 +72,10 @@ target "cmake" {
   }
 }
 
-# Generates: boost-ubuntu and boost-rhel
+# Generates: boost-debian and boost-rhel
 target "boost" {
   matrix = {
-    os = ["ubuntu", "rhel"]
+    os = ["debian", "rhel"]
   }
   name       = "boost-${os}"
   dockerfile = "Dockerfile.boost"
@@ -88,10 +88,10 @@ target "boost" {
   }
 }
 
-# Generates: final-ubuntu and final-rhel
+# Generates: final-debian and final-rhel
 target "final" {
   matrix = {
-    os = ["ubuntu", "rhel"]
+    os = ["debian", "rhel"]
   }
   name       = "final-${os}"
   dockerfile = "Dockerfile.final"

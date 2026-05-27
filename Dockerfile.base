@@ -4,7 +4,7 @@ ARG GCC_VERSION=00
 # debian + gccXX (official image) 
 # ==========================================
 
-FROM gcc:${GCC_VERSION} AS ubuntu
+FROM gcc:${GCC_VERSION} AS debian
 
 ARG GCC_VERSION
 
