@@ -63,7 +63,7 @@ target "cmake" {
   name       = "cmake-${os}"
   dockerfile = "Dockerfile.cmake"
   contexts = {
-    base = "target:base-${os}" # Dynamically links to the correct OS base
+    base = "target:base-${os}"
   }
   args = {
     CMAKE_URL = CMAKE_URL
@@ -79,7 +79,7 @@ target "boost" {
   name       = "boost-${os}"
   dockerfile = "Dockerfile.boost"
   contexts = {
-    base = "target:base-${os}" # Dynamically links to the correct OS base
+    base = "target:base-${os}"
   }
   args = {
     BOOST_URL = BOOST_URL
