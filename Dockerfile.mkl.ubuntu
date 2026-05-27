@@ -1,4 +1,4 @@
-FROM base AS mkl-ubuntu-downloader
+FROM base AS mkl-downloader
 ARG MKL_URL
 ARG MKL_URL_CHECKSUM
 
@@ -11,7 +11,7 @@ RUN apt-get update -y \
 
 FROM base
 
-COPY --from=mkl-ubuntu-downloader /tmp/mkl-install.x /tmp/mkl-install.x
+COPY --from=mkl-downloader /tmp/mkl-install.x /tmp/mkl-install.x
 
 RUN /tmp/mkl-install.x -a --silent --eula accept --install-dir /opt/intel/mkl \
  && rm -rf /tmp/*
