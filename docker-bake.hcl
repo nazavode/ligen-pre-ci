@@ -49,7 +49,6 @@ target "mkl" {
     base = "target:base-${os}"
   }
   args = {
-    OS_TYPE = os
     MKL_URL = MKL_URL
     MKL_URL_CHECKSUM_SHA256 = MKL_URL_CHECKSUM_SHA256
   }

@@ -4,6 +4,11 @@
 ARG GCC_VERSION=00
 
 FROM gcc:${GCC_VERSION} AS ubuntu
+RUN apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+      wget \
+      tar \
+      ca-certificates
 
 # ==========================================
 # RHEL 9 + gccXX (from official toolsets)
@@ -14,6 +19,8 @@ ARG GCC_VERSION=00
 
 RUN dnf -y update \
  && dnf install -y \
+      wget \
+      tar \
       gcc-toolset-${GCC_VERSION} \
       gcc-toolset-${GCC_VERSION}-libasan-devel  \
       gcc-toolset-${GCC_VERSION}-liblsan-devel  \

@@ -1,12 +1,11 @@
-FROM base 
+FROM base
+
 ARG CMAKE_URL
 ARG CMAKE_URL_CHECKSUM_SHA256
 
-RUN apt-get update -y \
- && apt-get install -y --no-install-recommends \
-      aria2 ca-certificates \
- && aria2c --checksum=sha-256="${CMAKE_URL_CHECKSUM_SHA256}" -d /tmp -o cmake-install.x "${CMAKE_URL}" \
+RUN wget -O /tmp/cmake-install.x -q "${CMAKE_URL}" \
+ && echo "${CMAKE_URL_CHECKSUM_SHA256} /tmp/cmake-install.x" | sha256sum --check - \
  && chmod +x /tmp/cmake-install.x \
  && mkdir -p /opt/cmake \
- && /tmp/cmake-install.x --skip-license --prefix=/opt/cmake \
+ && /tmp/cmake-install.x --prefix=/opt/cmake --skip-license \
  && rm -rf /tmp/*
