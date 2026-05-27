@@ -42,9 +42,11 @@ target "base" {
 }
 
 target "mkl" {
-  matrix = { os = ["ubuntu", "rhel"] }
+  matrix = {
+    os = ["ubuntu", "rhel"]
+  }
   name   = "mkl-${os}"
-  dockerfile = "Dockerfile.mkl" 
+  dockerfile = "Dockerfile.mkl"
   contexts = {
     base = "target:base-${os}"
   }
