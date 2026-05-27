@@ -1,0 +1,52 @@
+# ==========================================
+# Note: must be set or it makes the final MKL staget to error out
+ARG OS_TYPE=none
+
+# ==========================================
+# Ubuntu downloader stage
+# ==========================================
+FROM base AS mkl-downloader-ubuntu
+ARG MKL_URL
+ARG MKL_URL_CHECKSUM_SHA256
+
+RUN apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+      aria2 ca-certificates \
+ && aria2c --checksum=sha-256="${MKL_URL_CHECKSUM_SHA256}" -d /tmp -o mkl-install.x "${MKL_URL}" \
+ && chmod +x /tmp/mkl-install.x \
+ && rm -rf /var/lib/apt/lists/*
+
+# ==========================================
+# RHEL downloader stage
+# ==========================================
+FROM base AS mkl-downloader-rhel
+ARG MKL_URL
+ARG MKL_URL_CHECKSUM_SHA256
+
+RUN dnf -y update \
+ && dnf install -y wget \
+ && wget -O /tmp/mkl-install.x -q "${MKL_URL}" \
+ && echo "${MKL_URL_CHECKSUM_SHA256} /tmp/mkl-install.x" | sha256sum --check - \
+ && chmod +x /tmp/mkl-install.x \
+ && dnf clean all
+
+# ==========================================
+# Downloader stage resolver
+# Note: this is a workaround due to:
+# ERROR: target mkl-rhel: failed to solve: variable expansion is not supported for --from, define a new stage with FROM using ARG from global scope as a workaround
+# ==========================================
+FROM mkl-downloader-${OS_TYPE} AS mkl-downloader
+
+# ==========================================
+# MKL final stage
+# ==========================================
+FROM base
+COPY --from=mkl-downloader /tmp/mkl-install.x /tmp/mkl-install.x
+
+RUN /tmp/mkl-install.x -a --silent --eula accept --install-dir /opt/intel/mkl \
+ && rm -rf /tmp/*
+
+# intel-oneapi-mkl-devel
+# intel-oneapi-mkl
+# intel-oneapi-mkl-classic-devel
+# intel-oneapi-mkl-classic

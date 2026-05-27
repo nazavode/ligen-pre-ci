@@ -1,6 +1,6 @@
 FROM base
 ARG BOOST_URL
-ARG BOOST_URL_CHECKSUM
+ARG BOOST_URL_CHECKSUM_SHA256
 ARG BOOST_BUILD_TOOLSET=gcc
 ARG BOOST_BUILD_CXXSTD=20
 
@@ -9,7 +9,7 @@ ARG BOOST_BUILD_CXXSTD=20
 RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
       aria2 tar ca-certificates \
- && aria2c --checksum="${BOOST_URL_CHECKSUM}" -d /tmp -o boost.archive "${BOOST_URL}" \
+ && aria2c --checksum=sha-256="${BOOST_URL_CHECKSUM_SHA256}" -d /tmp -o boost.archive "${BOOST_URL}" \
  && mkdir -p /tmp/boost.src \
  && tar xf /tmp/boost.archive -C /tmp/boost.src/ --strip-components 1 \
  && cd /tmp/boost.src \

@@ -1,18 +1,22 @@
 # ==========================================
-# Ubuntu 22.04
+# debian + gccXX (official image) 
 # ==========================================
-FROM ubuntu:22.04 AS ubuntu
+ARG GCC_VERSION=00
 
-RUN apt-get update -y \
- && apt-get install -y --no-install-recommends \
-      build-essential \
- && rm -rf /var/lib/apt/lists/*
+FROM gcc:${GCC_VERSION} AS ubuntu
 
 # ==========================================
-# RHEL 9
+# RHEL 9 + gccXX (from official toolsets)
 # ==========================================
 FROM registry.access.redhat.com/ubi9/ubi AS rhel
 
-RUN dnf install -y \
-      aria2 gcc gcc-c++ make tar \
+ARG GCC_VERSION=00
+
+RUN dnf -y update \
+ && dnf install -y \
+      gcc-toolset-${GCC_VERSION} \
+      gcc-toolset-${GCC_VERSION}-libasan-devel  \
+      gcc-toolset-${GCC_VERSION}-liblsan-devel  \
+      gcc-toolset-${GCC_VERSION}-libtsan-devel  \
+      gcc-toolset-${GCC_VERSION}-libubsan-devel \
  && dnf clean all
