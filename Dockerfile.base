@@ -10,7 +10,9 @@ RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
       wget \
       tar \
-      ca-certificates
+      ninja-build \
+      ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
 # ==========================================
 # RHEL 9 + gccXX (from official toolsets)
@@ -23,6 +25,7 @@ RUN dnf -y update \
  && dnf install -y \
       wget \
       tar \
+      ninja-build \
       gcc-toolset-${GCC_VERSION} \
       gcc-toolset-${GCC_VERSION}-libasan-devel  \
       gcc-toolset-${GCC_VERSION}-liblsan-devel  \
