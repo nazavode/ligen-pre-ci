@@ -38,9 +38,9 @@ RUN dnf -y update \
 # . /opt/rh/gcc-toolset-14/enable
 # To look for modifications before and after the activation:
 # $ docker run --rm -it myimage bash -c 'printenv; source /opt/rh/gcc-toolset-14/enable; echo "---"; printenv'
-ENV PKG_CONFIG_PATH=/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/lib64/pkgconfig \
-    MANPATH=/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/share/man \
-    INFOPATH=/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/share/info \
-    LD_LIBRARY_PATH=/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/lib64:/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/lib \
-    PCP_DIR=/opt/rh/gcc-toolset-${GCC_VERSION}/root \
-    PATH=/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin:${PATH}
+ENV PKG_CONFIG_PATH="/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/lib64/pkgconfig:${PKG_CONFIG_PATH}" \
+    MANPATH="/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/share/man:${MANPATH}" \
+    INFOPATH="/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/share/info:${INFOPATH}" \
+    LD_LIBRARY_PATH="/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/lib64:/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/lib:/usr/lib:/usr/lib64:${LD_LIBRARY_PATH}" \
+    PCP_DIR="/opt/rh/gcc-toolset-${GCC_VERSION}/root:${PCP_DIR}" \
+    PATH="/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin:${PATH}"
