@@ -1,19 +1,26 @@
 variable "GCC_VERSION" { default = "14" }
-variable "CMAKE_VERSION" { default = "3.31.6" }
+variable "CLANG_VERSION" { default = "20" }
 variable "BOOST_VERSION" { default = "1.87.0" }
 
 variable "CMAKE_URL" { 
-  default = "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.sh"
+  default = "https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-Linux-x86_64.sh"
 }
 variable "CMAKE_URL_CHECKSUM" { 
   default = "sha-256=518c76bd18cc4ca5faab891db69b1289dc1bf134f394f0983a19576711b95210" 
 }
 
 variable "BOOST_URL" { 
-  default = "https://archives.boost.io/release/${BOOST_VERSION}/source/boost_${replace(BOOST_VERSION, ".", "_")}.tar.gz" 
+  default = "https://archives.boost.io/release/1.87.0/source/boost_${replace(BOOST_VERSION, ".", "_")}.tar.gz" 
 }
 variable "BOOST_URL_CHECKSUM" { 
   default = "sha-256=f55c340aa49763b1925ccf02b2e83f35fdcf634c9d5164a2acb87540173c741d"
+}
+
+variable "MKL_URL" {
+  default="https://registrationcenter-download.intel.com/akdlm/IRC_NAS/db60f483-f02e-4f7e-9bcd-5e01dba97444/intel-onemkl-2026.0.0.909_offline.sh"
+}
+variable "MKL_URL_CHECKSUM" {
+  default = "sha-256=f63fd6ce3a374993caa0482fec0a3b9f2c312beeabff82009ab51fca90c97225"
 }
 
 # Default group builds both matrix pipelines simultaneously
@@ -32,6 +39,19 @@ target "base" {
   platforms = ["linux/amd64"]
   args = {
     GCC_VERSION = GCC_VERSION
+  }
+}
+
+target "mkl" {
+  matrix = { os = ["ubuntu", "rhel"] }
+  name   = "mkl-${os}"
+  dockerfile = "Dockerfile.mkl.${os}" 
+  contexts = {
+    base = "target:base-${os}"
+  }
+  args = {
+    MKL_URL = MKL_URL
+    MKL_URL_CHECKSUM = MKL_URL_CHECKSUM
   }
 }
 
@@ -78,6 +98,7 @@ target "final" {
     base          = "target:base-${os}"
     cmake-builder = "target:cmake-${os}"
     boost-builder = "target:boost-${os}"
+    mkl-builder   = "target:mkl-${os}"
   }
   tags = [
     "my-cpp-builder:${os}-latest"

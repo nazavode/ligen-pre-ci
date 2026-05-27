@@ -1,0 +1,22 @@
+FROM base AS mkl-ubuntu-downloader
+ARG MKL_URL
+ARG MKL_URL_CHECKSUM
+
+RUN apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+      aria2 ca-certificates \
+ && aria2c --checksum="${MKL_URL_CHECKSUM}" -d /tmp -o mkl-install.x "${MKL_URL}" \
+ && chmod +x /tmp/mkl-install.x \
+ && rm -rf /var/lib/apt/lists/*
+
+FROM base
+
+COPY --from=mkl-ubuntu-downloader /tmp/mkl-install.x /tmp/mkl-install.x
+
+RUN /tmp/mkl-install.x -a --silent --eula accept --install-dir /opt/intel/mkl \
+ && rm -rf /tmp/*
+
+# intel-oneapi-mkl-devel
+# intel-oneapi-mkl
+# intel-oneapi-mkl-classic-devel
+# intel-oneapi-mkl-classic

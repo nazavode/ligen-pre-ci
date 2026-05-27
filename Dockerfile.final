@@ -2,7 +2,8 @@ FROM base
 
 COPY --from=cmake-builder /opt/cmake/ /usr/
 COPY --from=boost-builder /opt/boost/ /usr/
+COPY --from=mkl-builder /opt/intel /opt/intel
 
-ENV CC=gcc  \
-    CXX=g++ \
-    FC=gfortran
+RUN apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+      build-essential \

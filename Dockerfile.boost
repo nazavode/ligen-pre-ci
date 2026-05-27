@@ -2,7 +2,10 @@ FROM base
 ARG BOOST_URL
 ARG BOOST_URL_CHECKSUM
 
-RUN aria2c --checksum="${BOOST_URL_CHECKSUM}" -d /tmp -o boost.archive "${BOOST_URL}" \
+RUN apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+      build-essential aria2 tar ca-certificates \
+ && aria2c --checksum="${BOOST_URL_CHECKSUM}" -d /tmp -o boost.archive "${BOOST_URL}" \
  && mkdir -p /tmp/boost.src \
  && tar xf /tmp/boost.archive -C /tmp/boost.src/ --strip-components 1 \
  && cd /tmp/boost.src \

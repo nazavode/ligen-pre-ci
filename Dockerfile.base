@@ -5,7 +5,7 @@ FROM ubuntu:22.04 AS ubuntu
 
 RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
-      aria2 gcc g++ make tar ca-certificates \
+      build-essential \
  && rm -rf /var/lib/apt/lists/*
 
 # ==========================================
