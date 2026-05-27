@@ -20,7 +20,7 @@ RUN wget -O /tmp/boost.archive -q "${BOOST_URL}" \
 
 FROM base
 ARG BOOST_BUILD_TOOLSET=gcc
-ARG BOOST_BUILD_CXXSTD=c++20
+ARG BOOST_BUILD_CXXSTD=20
 
 COPY --from=boost-downloader /tmp/boost.src /tmp/boost.src
 

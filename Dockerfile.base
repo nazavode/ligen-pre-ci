@@ -1,9 +1,13 @@
+ARG GCC_VERSION=00
+
 # ==========================================
 # debian + gccXX (official image) 
 # ==========================================
-ARG GCC_VERSION=00
 
 FROM gcc:${GCC_VERSION} AS ubuntu
+
+ARG GCC_VERSION
+
 RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
       wget \
@@ -15,7 +19,7 @@ RUN apt-get update -y \
 # ==========================================
 FROM registry.access.redhat.com/ubi9/ubi AS rhel
 
-ARG GCC_VERSION=00
+ARG GCC_VERSION
 
 RUN dnf -y update \
  && dnf install -y \
