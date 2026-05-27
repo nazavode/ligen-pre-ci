@@ -58,35 +58,6 @@ target "base" {
   }
 }
 
-target "mkl" {
-  matrix     = { env = ENV_TARGETS }
-  platforms  = ["linux/amd64"]
-  name       = "mkl-${env}"
-  dockerfile = "Dockerfile.mkl"
-  contexts = {
-    base = "target:base-${env}"
-  }
-  args = {
-    MKL_URL = MKL_URL
-    MKL_URL_CHECKSUM_SHA256 = MKL_URL_CHECKSUM_SHA256
-  }
-}
-
-# Generates: cmake-debian and cmake-rhel
-target "cmake" {
-  matrix     = { env = ENV_TARGETS }
-  platforms  = ["linux/amd64"]
-  name       = "cmake-${env}"
-  dockerfile = "Dockerfile.cmake"
-  contexts = {
-    base = "target:base-${env}"
-  }
-  args = {
-    CMAKE_URL = CMAKE_URL
-    CMAKE_URL_CHECKSUM_SHA256 = CMAKE_URL_CHECKSUM_SHA256
-  }
-}
-
 # Generates: boost-debian and boost-rhel
 target "boost" {
   matrix     = { env = ENV_TARGETS }
@@ -110,9 +81,13 @@ target "final" {
   dockerfile = "Dockerfile.final"
   contexts = {
     base          = "target:base-${env}"
-    cmake-builder = "target:cmake-${env}"
     boost-builder = "target:boost-${env}"
-    mkl-builder   = "target:mkl-${env}"
+  }
+  args = {
+    CMAKE_URL = CMAKE_URL
+    CMAKE_URL_CHECKSUM_SHA256 = CMAKE_URL_CHECKSUM_SHA256
+    MKL_URL = MKL_URL
+    MKL_URL_CHECKSUM_SHA256 = MKL_URL_CHECKSUM_SHA256
   }
   tags = [
     "final:${env}-latest"
