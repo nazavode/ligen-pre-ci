@@ -102,6 +102,6 @@ target "final" {
     mkl-builder   = "target:mkl-${os}"
   }
   tags = [
-    "my-cpp-builder:${os}-latest"
+    "ligen-pre-ci:${os}-latest"
   ]
 }
