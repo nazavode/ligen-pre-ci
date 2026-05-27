@@ -1,12 +1,26 @@
-FROM base AS mkl-downloader-rhel
+# ==========================================
+# Downloader stage
+# Keep builder and downloader separated so
+# different builders can reuse the same
+# downloaded artifact.
+# ==========================================
+FROM base AS mkl-downloader
 
 ARG MKL_URL
 ARG MKL_URL_CHECKSUM_SHA256
 
 RUN wget -O /tmp/mkl-install.x -q "${MKL_URL}" \
  && echo "${MKL_URL_CHECKSUM_SHA256} /tmp/mkl-install.x" | sha256sum --check - \
- && chmod +x /tmp/mkl-install.x \
- && /tmp/mkl-install.x -a --silent --eula accept --install-dir /opt/intel/mkl \
+ && chmod +x /tmp/mkl-install.x
+
+# ==========================================
+# Builder stage
+# ==========================================
+FROM base
+
+COPY --from=mkl-downloader /tmp/mkl-install.x /tmp/mkl-install.x
+
+RUN /tmp/mkl-install.x -a --silent --eula accept --install-dir /opt/intel/mkl \
  && rm -rf /tmp/*
 
 # intel-oneapi-mkl-devel

@@ -1,14 +1,30 @@
-FROM base
+# ==========================================
+# Downloader stage
+# Keep builder and downloader separated so
+# different builders can reuse the same
+# downloaded artifact.
+# ==========================================
+
+FROM base AS boost-downloader
 ARG BOOST_URL
 ARG BOOST_URL_CHECKSUM_SHA256
-ARG BOOST_BUILD_TOOLSET=gcc
-ARG BOOST_BUILD_CXXSTD=c++20
 
 RUN wget -O /tmp/boost.archive -q "${BOOST_URL}" \
  && echo "${BOOST_URL_CHECKSUM_SHA256} /tmp/boost.archive" | sha256sum --check - \
  && mkdir -p /tmp/boost.src \
- && tar xf /tmp/boost.archive -C /tmp/boost.src/ --strip-components 1 \
- && cd /tmp/boost.src \
+ && tar xf /tmp/boost.archive -C /tmp/boost.src/ --strip-components 1
+
+# ==========================================
+# Builder stage
+# ==========================================
+
+FROM base
+ARG BOOST_BUILD_TOOLSET=gcc
+ARG BOOST_BUILD_CXXSTD=c++20
+
+COPY --from=boost-downloader /tmp/boost.src /tmp/boost.src
+
+RUN cd /tmp/boost.src \
  && ./bootstrap.sh --with-toolset="${BOOST_BUILD_TOOLSET}" --with-libraries=graph,program_options \
  && ./b2 cxxstd="${BOOST_BUILD_CXXSTD}" toolset="${BOOST_BUILD_TOOLSET}" --with-graph --with-program_options stage \
  && ./b2 cxxstd="${BOOST_BUILD_CXXSTD}" toolset="${BOOST_BUILD_TOOLSET}" --with-graph --with-program_options --prefix=/opt/boost install \
