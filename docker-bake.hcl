@@ -1,5 +1,5 @@
 variable "GCC_VERSION" { default = "14" }
-variable "CLANG_VERSION" { default = "20" }
+# variable "CLANG_VERSION" { default = "20" }
 
 variable "CMAKE_URL" { 
   default = "https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-Linux-x86_64.sh"
@@ -39,6 +39,9 @@ target "base" {
   args = {
     GCC_VERSION = GCC_VERSION
   }
+  tags = [
+    "mybase:${os}-latest"
+  ]
 }
 
 target "mkl" {
@@ -102,6 +105,6 @@ target "final" {
     mkl-builder   = "target:mkl-${os}"
   }
   tags = [
-    "ligen-pre-ci:${os}-latest"
+    "final:${os}-latest"
   ]
 }
