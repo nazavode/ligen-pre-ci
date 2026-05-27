@@ -2,7 +2,7 @@ FROM base
 ARG BOOST_URL
 ARG BOOST_URL_CHECKSUM_SHA256
 ARG BOOST_BUILD_TOOLSET=gcc
-ARG BOOST_BUILD_CXXSTD=20
+ARG BOOST_BUILD_CXXSTD=c++20
 
 RUN wget -O /tmp/boost.archive -q "${BOOST_URL}" \
  && echo "${BOOST_URL_CHECKSUM_SHA256} /tmp/boost.archive" | sha256sum --check - \
