@@ -1,6 +1,3 @@
-variable "GCC_VERSION" { default = "14" }
-# variable "CLANG_VERSION" { default = "20" }
-
 variable "CMAKE_URL" { 
   default = "https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-Linux-x86_64.sh"
 }
@@ -22,30 +19,52 @@ variable "MKL_URL_CHECKSUM_SHA256" {
   default = "f63fd6ce3a374993caa0482fec0a3b9f2c312beeabff82009ab51fca90c97225"
 }
 
-# Default group builds both matrix pipelines simultaneously
+variable "ENV_TARGETS" {
+  default = [
+    "debian-gcc11",
+    "debian-gcc14",
+    "rhel-gcc14"
+  ]
+}
+
+function "os" {
+  params = [env]
+  result = split("-", env)[0]
+}
+
+function "cc" {
+  params = [env]
+  result = regex("^[a-z]+", split("-", env)[1])
+}
+
+function "ccver" {
+  params = [env]
+  result = regex("[0-9]+$",  split("-", env)[1])
+}
+
 group "default" {
-  targets = ["final"]
+  targets = [for env in ENV_TARGETS : "final-${env}"]
 }
 
 # Generates: base-debian and base-rhel
 target "base" {
-  matrix = { os = ["debian", "rhel"] }
-  platforms = ["linux/amd64"]
-  name       = "base-${os}"
+  matrix     = { env = ENV_TARGETS }
+  platforms  = ["linux/amd64"]
+  name       = "base-${env}"
   dockerfile = "Dockerfile.base"
-  target     = os
+  target     = os(env)
   args = {
-    GCC_VERSION = GCC_VERSION
+    GCC_VERSION = ccver(env)
   }
 }
 
 target "mkl" {
-  matrix = { os = ["debian", "rhel"] }
-  platforms = ["linux/amd64"]
-  name   = "mkl-${os}"
+  matrix     = { env = ENV_TARGETS }
+  platforms  = ["linux/amd64"]
+  name       = "mkl-${env}"
   dockerfile = "Dockerfile.mkl"
   contexts = {
-    base = "target:base-${os}"
+    base = "target:base-${env}"
   }
   args = {
     MKL_URL = MKL_URL
@@ -55,12 +74,12 @@ target "mkl" {
 
 # Generates: cmake-debian and cmake-rhel
 target "cmake" {
-  matrix = { os = ["debian", "rhel"] }
-  platforms = ["linux/amd64"]
-  name       = "cmake-${os}"
+  matrix     = { env = ENV_TARGETS }
+  platforms  = ["linux/amd64"]
+  name       = "cmake-${env}"
   dockerfile = "Dockerfile.cmake"
   contexts = {
-    base = "target:base-${os}"
+    base = "target:base-${env}"
   }
   args = {
     CMAKE_URL = CMAKE_URL
@@ -70,12 +89,12 @@ target "cmake" {
 
 # Generates: boost-debian and boost-rhel
 target "boost" {
-  matrix = { os = ["debian", "rhel"] }
-  platforms = ["linux/amd64"]
-  name       = "boost-${os}"
+  matrix     = { env = ENV_TARGETS }
+  platforms  = ["linux/amd64"]
+  name       = "boost-${env}"
   dockerfile = "Dockerfile.boost"
   contexts = {
-    base = "target:base-${os}"
+    base = "target:base-${env}"
   }
   args = {
     BOOST_URL = BOOST_URL
@@ -85,17 +104,17 @@ target "boost" {
 
 # Generates: final-debian and final-rhel
 target "final" {
-  matrix = { os = ["debian", "rhel"] }
-  platforms = ["linux/amd64"]
-  name       = "final-${os}"
+  matrix     = { env = ENV_TARGETS }
+  platforms  = ["linux/amd64"]
+  name       = "final-${env}"
   dockerfile = "Dockerfile.final"
   contexts = {
-    base          = "target:base-${os}"
-    cmake-builder = "target:cmake-${os}"
-    boost-builder = "target:boost-${os}"
-    mkl-builder   = "target:mkl-${os}"
+    base          = "target:base-${env}"
+    cmake-builder = "target:cmake-${env}"
+    boost-builder = "target:boost-${env}"
+    mkl-builder   = "target:mkl-${env}"
   }
   tags = [
-    "final:${os}-latest"
+    "final:${env}-latest"
   ]
 }
