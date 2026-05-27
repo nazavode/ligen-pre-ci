@@ -27,29 +27,3 @@ RUN /tmp/mkl-install.x -a --silent --eula accept --install-dir /opt/intel/mkl \
 # intel-oneapi-mkl
 # intel-oneapi-mkl-classic-devel
 # intel-oneapi-mkl-classic
-
-# Note: we don't want to deal with entrypoints, let's try to replicate
-# environment changes usually applied by toolset activation scripts like:
-# . /opt/intel/mkl/setvars.sh
-# To look for modifications before and after the activation:
-# $ docker run --rm -it myimage bash -c 'printenv; source /opt/intel/mkl/setvars.sh; echo "---"; printenv'
-# ENV PKG_CONFIG_PATH=${PREFIX}/tbb/2023.0/env/../lib/pkgconfig:${PREFIX}/mpi/2021.18/lib/pkgconfig:${PREFIX}/mkl/2026.0/lib/pkgconfig:${PREFIX}/compiler/2026.0/lib/pkgconfig:${PKG_CONFIG_PATH} \
-#     CMAKE_PREFIX_PATH=${PREFIX}/tbb/2023.0/env/..:${PREFIX}/mkl/2026.0/lib/cmake:${PREFIX}/compiler/2026.0:${CMAKE_PREFIX_PATH} \
-#     LD_LIBRARY_PATH=${PREFIX}/tcm/1.5/lib:${PREFIX}/umf/1.1/lib:${PREFIX}/tcm/1.5/env/../lib:${PREFIX}/tbb/2023.0/env/../lib/intel64/gcc4.8:${PREFIX}/mpi/2021.18/opt/mpi/libfabric/lib:${PREFIX}/mpi/2021.18/lib:${PREFIX}/mkl/2026.0/lib:${PREFIX}/compiler/2026.0/opt/compiler/lib:${PREFIX}/compiler/2026.0/lib:${LD_LIBRARY_PATH}
-
-# ENV PKG_CONFIG_PATH=/opt/intel/mkl/tbb/2023.0/env/../lib/pkgconfig:/opt/intel/mkl/mpi/2021.18/lib/pkgconfig:/opt/intel/mkl/mkl/2026.0/lib/pkgconfig:/opt/intel/mkl/compiler/2026.0/lib/pkgconfig:${PKG_CONFIG_PATH} \
-#     DIAGUTIL_PATH=/opt/intel/mkl/compiler/2026.0/etc/compiler/sys_check/sys_check.sh \
-#     MANPATH=/opt/intel/mkl/mpi/2021.18/share/man:/opt/intel/mkl/compiler/2026.0/share/man:${MANPATH} \
-#     TCM_ROOT=/opt/intel/mkl/tcm/1.5 \
-#     CMAKE_PREFIX_PATH=/opt/intel/mkl/tbb/2023.0/env/..:/opt/intel/mkl/mkl/2026.0/lib/cmake:/opt/intel/mkl/compiler/2026.0:${CMAKE_PREFIX_PATH} \
-#     CMPLR_ROOT=/opt/intel/mkl/compiler/2026.0 \
-#     CPLUS_INCLUDE_PATH=/opt/intel/mkl/umf/1.1/include:/opt/intel/mkl/tbb/2023.0/env/../include:/opt/intel/mkl/mpi/2021.18/include:/opt/intel/mkl/mkl/2026.0/include \
-#     UMF_ROOT=/opt/intel/mkl/umf/1.1 \
-#     LIBRARY_PATH=/opt/intel/mkl/tcm/1.5/lib:/opt/intel/mkl/umf/1.1/lib:/opt/intel/mkl/tbb/2023.0/env/../lib/intel64/gcc4.8:/opt/intel/mkl/mpi/2021.18/lib:/opt/intel/mkl/mkl/2026.0/lib:/opt/intel/mkl/compiler/2026.0/lib \
-#     TCMROOT=/opt/intel/mkl/tcm/1.5/env/.. \
-#     LD_LIBRARY_PATH=/opt/intel/mkl/tcm/1.5/lib:/opt/intel/mkl/umf/1.1/lib:/opt/intel/mkl/tcm/1.5/env/../lib:/opt/intel/mkl/tbb/2023.0/env/../lib/intel64/gcc4.8:/opt/intel/mkl/mpi/2021.18/opt/mpi/libfabric/lib:/opt/intel/mkl/mpi/2021.18/lib:/opt/intel/mkl/mkl/2026.0/lib:/opt/intel/mkl/compiler/2026.0/opt/compiler/lib:/opt/intel/mkl/compiler/2026.0/lib:${LD_LIBRARY_PATH} \
-#     MKLROOT=/opt/intel/mkl/mkl/2026.0 \
-#     NLSPATH=/opt/intel/mkl/compiler/2026.0/lib/compiler/locale/%l_%t/%N \
-#     PATH=/opt/intel/mkl/mpi/2021.18/bin:/opt/intel/mkl/mkl/2026.0/bin:/opt/intel/mkl/compiler/2026.0/bin:${PATH} \
-#     C_INCLUDE_PATH=/opt/intel/mkl/umf/1.1/include:/opt/intel/mkl/tbb/2023.0/env/../include:/opt/intel/mkl/mpi/2021.18/include:/opt/intel/mkl/mkl/2026.0/include \
-#     CPATH=/opt/intel/mkl/umf/1.1/include

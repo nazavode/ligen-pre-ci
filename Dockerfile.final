@@ -3,3 +3,12 @@ FROM base
 COPY --from=cmake-builder /opt/cmake/ /usr/
 COPY --from=boost-builder /opt/boost/ /usr/
 COPY --from=mkl-builder /opt/intel /opt/intel
+
+# Note: we don't want to deal with entrypoints, let's try to replicate
+# environment changes usually applied by toolset activation scripts like:
+# . /opt/intel/mkl/setvars.sh
+# To look for modifications before and after the activation:
+# $ docker run --rm -it myimage bash -c 'printenv; source /opt/intel/mkl/setvars.sh; echo "---"; printenv'
+ENV PKG_CONFIG_PATH="/opt/intel/mkl/tbb/2023.0/env/../lib/pkgconfig:/opt/intel/mkl/mpi/2021.18/lib/pkgconfig:/opt/intel/mkl/mkl/2026.0/lib/pkgconfig:/opt/intel/mkl/compiler/2026.0/lib/pkgconfig:${PKG_CONFIG_PATH}" \
+    CMAKE_PREFIX_PATH="/opt/intel/mkl/tbb/2023.0/env/..:/opt/intel/mkl/mkl/2026.0/lib/cmake:/opt/intel/mkl/compiler/2026.0:${CMAKE_PREFIX_PATH}" \
+    LD_LIBRARY_PATH="/opt/intel/mkl/tcm/1.5/lib:/opt/intel/mkl/umf/1.1/lib:/opt/intel/mkl/tcm/1.5/env/../lib:/opt/intel/mkl/tbb/2023.0/env/../lib/intel64/gcc4.8:/opt/intel/mkl/mpi/2021.18/opt/mpi/libfabric/lib:/opt/intel/mkl/mpi/2021.18/lib:/opt/intel/mkl/mkl/2026.0/lib:/opt/intel/mkl/compiler/2026.0/opt/compiler/lib:/opt/intel/mkl/compiler/2026.0/lib:${LD_LIBRARY_PATH}"
