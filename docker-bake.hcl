@@ -29,9 +29,7 @@ group "default" {
 
 # Generates: base-debian and base-rhel
 target "base" {
-  matrix = {
-    os = ["debian", "rhel"]
-  }
+  matrix = { os = ["debian", "rhel"] }
   name       = "base-${os}"
   dockerfile = "Dockerfile.base"
   target     = os
@@ -39,15 +37,10 @@ target "base" {
   args = {
     GCC_VERSION = GCC_VERSION
   }
-  tags = [
-    "mybase:${os}-latest"
-  ]
 }
 
 target "mkl" {
-  matrix = {
-    os = ["debian", "rhel"]
-  }
+  matrix = { os = ["debian", "rhel"] }
   name   = "mkl-${os}"
   dockerfile = "Dockerfile.mkl"
   contexts = {
@@ -61,9 +54,7 @@ target "mkl" {
 
 # Generates: cmake-debian and cmake-rhel
 target "cmake" {
-  matrix = {
-    os = ["debian", "rhel"]
-  }
+  matrix = { os = ["debian", "rhel"] }
   name       = "cmake-${os}"
   dockerfile = "Dockerfile.cmake"
   contexts = {
@@ -77,9 +68,7 @@ target "cmake" {
 
 # Generates: boost-debian and boost-rhel
 target "boost" {
-  matrix = {
-    os = ["debian", "rhel"]
-  }
+  matrix = { os = ["debian", "rhel"] }
   name       = "boost-${os}"
   dockerfile = "Dockerfile.boost"
   contexts = {
@@ -93,9 +82,7 @@ target "boost" {
 
 # Generates: final-debian and final-rhel
 target "final" {
-  matrix = {
-    os = ["debian", "rhel"]
-  }
+  matrix = { os = ["debian", "rhel"] }
   name       = "final-${os}"
   dockerfile = "Dockerfile.final"
   contexts = {
