@@ -7,7 +7,8 @@ RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
       wget \
       tar \
-      ca-certificates
+      ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
 # ==========================================
 # mkl-installer: installs mkl to /opt/intel/mkl
@@ -21,8 +22,7 @@ RUN wget -O /tmp/mkl-install.x -q "${MKL_URL}" \
  && echo "${MKL_URL_CHECKSUM_SHA256} /tmp/mkl-install.x" | sha256sum --check - \
  && chmod +x /tmp/mkl-install.x \
  && /tmp/mkl-install.x -a --silent --eula accept --install-dir /opt/intel/mkl \
- && rm -rf /tmp/* \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /tmp/*
 
 # ==========================================
 # cmake-installer: installs cmake to /usr
