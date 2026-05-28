@@ -2,6 +2,10 @@ variable "VERSION" {
   default = "latest" 
 }
 
+variable "IMAGE" { 
+  default = "final" 
+}
+
 variable "ENV_TARGETS" {
   default = [
     "debian-gcc11",
@@ -76,6 +80,6 @@ target "final" {
     MKL_URL_CHECKSUM_SHA256   = "f63fd6ce3a374993caa0482fec0a3b9f2c312beeabff82009ab51fca90c97225"
   }
   tags = [
-    "final:${env}-${VERSION}"
+    "${IMAGE}:${env}-${VERSION}"
   ]
 }
