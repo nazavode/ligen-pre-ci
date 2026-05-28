@@ -1,10 +1,10 @@
-ARG GCC_VERSION=00
+ARG CC_VERSION=00
 
 # ==========================================
 # debian + gccXX (official image) 
 # ==========================================
 
-FROM gcc:${GCC_VERSION} AS debian
+FROM gcc:${CC_VERSION} AS debian
 
 RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
@@ -19,18 +19,18 @@ RUN apt-get update -y \
 # ==========================================
 FROM registry.access.redhat.com/ubi9/ubi AS rhel
 
-ARG GCC_VERSION
+ARG CC_VERSION
 
 RUN dnf -y update \
  && dnf install -y \
       wget \
       tar \
       ninja-build \
-      gcc-toolset-${GCC_VERSION} \
-      gcc-toolset-${GCC_VERSION}-libasan-devel  \
-      gcc-toolset-${GCC_VERSION}-liblsan-devel  \
-      gcc-toolset-${GCC_VERSION}-libtsan-devel  \
-      gcc-toolset-${GCC_VERSION}-libubsan-devel \
+      gcc-toolset-${CC_VERSION} \
+      gcc-toolset-${CC_VERSION}-libasan-devel  \
+      gcc-toolset-${CC_VERSION}-liblsan-devel  \
+      gcc-toolset-${CC_VERSION}-libtsan-devel  \
+      gcc-toolset-${CC_VERSION}-libubsan-devel \
  && dnf clean all
 
 # Note: we don't want to deal with entrypoints, let's try to replicate
@@ -38,9 +38,9 @@ RUN dnf -y update \
 # . /opt/rh/gcc-toolset-14/enable
 # To look for modifications before and after the activation:
 # $ docker run --rm -it myimage bash -c 'printenv; source /opt/rh/gcc-toolset-14/enable; echo "---"; printenv'
-ENV PKG_CONFIG_PATH="/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/lib64/pkgconfig:${PKG_CONFIG_PATH}" \
-    MANPATH="/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/share/man:${MANPATH}" \
-    INFOPATH="/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/share/info:${INFOPATH}" \
-    LD_LIBRARY_PATH="/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/lib64:/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/lib:/usr/lib:/usr/lib64:${LD_LIBRARY_PATH}" \
-    PCP_DIR="/opt/rh/gcc-toolset-${GCC_VERSION}/root:${PCP_DIR}" \
-    PATH="/opt/rh/gcc-toolset-${GCC_VERSION}/root/usr/bin:${PATH}"
+ENV PKG_CONFIG_PATH="/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/lib64/pkgconfig:${PKG_CONFIG_PATH}" \
+    MANPATH="/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/share/man:${MANPATH}" \
+    INFOPATH="/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/share/info:${INFOPATH}" \
+    LD_LIBRARY_PATH="/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/lib64:/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/lib:/usr/lib:/usr/lib64:${LD_LIBRARY_PATH}" \
+    PCP_DIR="/opt/rh/gcc-toolset-${CC_VERSION}/root:${PCP_DIR}" \
+    PATH="/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/bin:${PATH}"

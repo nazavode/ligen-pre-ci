@@ -55,8 +55,7 @@ target "base" {
   dockerfile = "Dockerfile.base.${cc(env)}"
   target     = os(env)
   args = {
-    GCC_VERSION   = ccver(env)
-    CLANG_VERSION = ccver(env)
+    CC_VERSION   = ccver(env)
   }
 }
 
