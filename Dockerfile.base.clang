@@ -1,0 +1,36 @@
+# ==========================================
+# debian + clangXX
+# ==========================================
+
+FROM debian:trixie AS debian
+
+ARG CLANG_VERSION=00
+
+RUN apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+      wget \
+      ca-certificates \
+      ninja-build \
+ && wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc \
+ && echo "\
+deb http://apt.llvm.org/trixie/ llvm-toolchain-trixie-${CLANG_VERSION} main\n\
+deb-src http://apt.llvm.org/trixie/ llvm-toolchain-trixie-${CLANG_VERSION} main\n" >> /etc/apt/sources.list \
+ && apt-get update -y \
+ && apt-get install -y \
+       clang-${CLANG_VERSION} \
+       clang-tools-${CLANG_VERSION} \
+       clang-format-${CLANG_VERSION} \
+       clang-tidy-${CLANG_VERSION} \
+       libclang-rt-${CLANG_VERSION}-dev \
+       libc++-${CLANG_VERSION}-dev \
+       libc++abi-${CLANG_VERSION}-dev \
+       lld-${CLANG_VERSION} \
+       llvm-${CLANG_VERSION}-linker-tools \
+ && update-alternatives \
+    --install /usr/bin/clang           clang           /usr/bin/clang-${CLANG_VERSION} 200 \
+    --slave   /usr/bin/clang++         clang++         /usr/bin/clang++-${CLANG_VERSION} \
+    --slave   /usr/bin/lld             lld             /usr/bin/lld-${CLANG_VERSION} \
+    --slave   /usr/bin/clang-tidy      clang-tidy      /usr/bin/clang-tidy-${CLANG_VERSION} \
+    --slave   /usr/bin/clang-format    clang-format    /usr/bin/clang-format-${CLANG_VERSION} \
+    --slave   /usr/bin/llvm-symbolizer llvm-symbolizer /usr/bin/llvm-symbolizer-${CLANG_VERSION} \
+ && rm -rf /var/lib/apt/lists/*

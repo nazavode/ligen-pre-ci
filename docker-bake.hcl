@@ -23,8 +23,13 @@ variable "ENV_TARGETS" {
   default = [
     "debian-gcc11",
     "debian-gcc14",
-    "rhel-gcc14"
+    "rhel-gcc14",
+    "debian-clang20"
   ]
+}
+
+group "default" {
+  targets = [for env in ENV_TARGETS : "final-${env}"]
 }
 
 function "os" {
@@ -42,20 +47,20 @@ function "ccver" {
   result = regex("[0-9]+$",  split("-", env)[1])
 }
 
-group "default" {
-  targets = [for env in ENV_TARGETS : "final-${env}"]
-}
-
 # Generates: base-debian and base-rhel
 target "base" {
   matrix     = { env = ENV_TARGETS }
   platforms  = ["linux/amd64"]
   name       = "base-${env}"
-  dockerfile = "Dockerfile.base"
+  dockerfile = "Dockerfile.base.${cc(env)}"
   target     = os(env)
   args = {
     GCC_VERSION = ccver(env)
+    CLANG_VERSION = ccver(env)
   }
+  tags = [
+    "base:${env}-latest"
+  ]
 }
 
 # Generates: boost-debian and boost-rhel
