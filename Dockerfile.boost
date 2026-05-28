@@ -41,6 +41,6 @@ COPY --from=flagger /opt/boost.env /tmp/boost.env
 RUN cd /tmp/boost.src \
  && . /tmp/boost.env \
  && ./bootstrap.sh --with-toolset="${BOOST_BUILD_TOOLSET}" --with-libraries=graph,program_options \
- && ./b2 cxxflags="${BOOST_CXXFLAGS}" linkflags="${BOOST_LDFLAGS}" toolset="${BOOST_BUILD_TOOLSET}" cxxstd=20 --with-graph --with-program_options stage \
- && ./b2 cxxflags="${BOOST_CXXFLAGS}" linkflags="${BOOST_LDFLAGS}" toolset="${BOOST_BUILD_TOOLSET}" cxxstd=20 --with-graph --with-program_options --prefix=/opt/boost install \
+ && ./b2 -d0 cxxflags="${BOOST_CXXFLAGS}" linkflags="${BOOST_LDFLAGS}" toolset="${BOOST_BUILD_TOOLSET}" cxxstd=20 --with-graph --with-program_options stage \
+ && ./b2 -d0 cxxflags="${BOOST_CXXFLAGS}" linkflags="${BOOST_LDFLAGS}" toolset="${BOOST_BUILD_TOOLSET}" cxxstd=20 --with-graph --with-program_options --prefix=/opt/boost install \
  && rm -rf /tmp/*
