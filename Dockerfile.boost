@@ -14,17 +14,33 @@ RUN apk add aria2 \
  && rm -rf /var/cache/apk/*
 
 # ==========================================
+# Build flags stage
+# ==========================================
+FROM alpine:latest AS flagger
+
+ARG BOOST_BUILD_TOOLSET
+
+RUN mkdir -p /opt \
+ && touch /opt/boost.env \
+ && if [ "${BOOST_BUILD_TOOLSET}" = "clang" ]; then \
+      echo "export BOOST_CXXFLAGS='-stdlib=libc++'" >> /opt/boost.env; \
+      echo "export BOOST_LDFLAGS='-stdlib=libc++'" >> /opt/boost.env; \
+    fi
+
+# ==========================================
 # Builder stage
 # ==========================================
 
 FROM base
-ARG BOOST_BUILD_TOOLSET=gcc
-ARG BOOST_BUILD_CXXSTD=20
+
+ARG BOOST_BUILD_TOOLSET
 
 COPY --from=downloader /opt/boost.src /tmp/boost.src
+COPY --from=flagger /opt/boost.env /tmp/boost.env
 
 RUN cd /tmp/boost.src \
+ && . /tmp/boost.env \
  && ./bootstrap.sh --with-toolset="${BOOST_BUILD_TOOLSET}" --with-libraries=graph,program_options \
- && ./b2 cxxstd="${BOOST_BUILD_CXXSTD}" toolset="${BOOST_BUILD_TOOLSET}" --with-graph --with-program_options stage \
- && ./b2 cxxstd="${BOOST_BUILD_CXXSTD}" toolset="${BOOST_BUILD_TOOLSET}" --with-graph --with-program_options --prefix=/opt/boost install \
+ && ./b2 cxxflags="${BOOST_CXXFLAGS}" linkflags="${BOOST_LDFLAGS}" toolset="${BOOST_BUILD_TOOLSET}" cxxstd=20 --with-graph --with-program_options stage \
+ && ./b2 cxxflags="${BOOST_CXXFLAGS}" linkflags="${BOOST_LDFLAGS}" toolset="${BOOST_BUILD_TOOLSET}" cxxstd=20 --with-graph --with-program_options --prefix=/opt/boost install \
  && rm -rf /tmp/*

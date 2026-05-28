@@ -70,6 +70,7 @@ target "boost" {
     base = "target:base-${env}"
   }
   args = {
+    BOOST_BUILD_TOOLSET = cc(env)
     BOOST_URL = BOOST_URL
     BOOST_URL_CHECKSUM_SHA256 = BOOST_URL_CHECKSUM_SHA256
   }
