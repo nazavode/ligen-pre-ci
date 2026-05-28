@@ -1,9 +1,11 @@
-variable "VERSION" { 
-  default = "latest" 
-}
-
+# Image name used while tagging the final stage.
 variable "IMAGE" { 
   default = "final" 
+}
+
+# Image version used while tagging the final stage.
+variable "VERSION" { 
+  default = "latest" 
 }
 
 variable "ENV_TARGETS" {
@@ -19,22 +21,33 @@ group "default" {
   targets = [for env in ENV_TARGETS : "final-${env}"]
 }
 
+# ==========================================
+# Helper functions to parse target environment
+# strings
+# ==========================================
+
+# os(debian-gcc11) → debian
 function "os" {
   params = [env]
   result = split("-", env)[0]
 }
 
+# cc(debian-gcc11) → gcc
 function "cc" {
   params = [env]
   result = regex("^[a-z]+", split("-", env)[1])
 }
 
+# ccver(debian-gcc11) → 11
 function "ccver" {
   params = [env]
   result = regex("[0-9]+$",  split("-", env)[1])
 }
 
-# Generates: base-debian and base-rhel
+# ==========================================
+# Targets/intermediate stages
+# ==========================================
+
 target "base" {
   matrix     = { env = ENV_TARGETS }
   platforms  = ["linux/amd64"]
@@ -42,12 +55,11 @@ target "base" {
   dockerfile = "Dockerfile.base.${cc(env)}"
   target     = os(env)
   args = {
-    GCC_VERSION = ccver(env)
+    GCC_VERSION   = ccver(env)
     CLANG_VERSION = ccver(env)
   }
 }
 
-# Generates: boost-debian and boost-rhel
 target "boost" {
   matrix     = { env = ENV_TARGETS }
   platforms  = ["linux/amd64"]
@@ -63,7 +75,10 @@ target "boost" {
   }
 }
 
-# Generates: final-debian and final-rhel
+# ==========================================
+# Final target
+# ==========================================
+
 target "final" {
   matrix     = { env = ENV_TARGETS }
   platforms  = ["linux/amd64"]
