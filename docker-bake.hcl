@@ -1,3 +1,7 @@
+variable "VERSION" { 
+  default = "latest" 
+}
+
 variable "CMAKE_URL" { 
   default = "https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-Linux-x86_64.sh"
 }
@@ -93,6 +97,6 @@ target "final" {
     MKL_URL_CHECKSUM_SHA256 = MKL_URL_CHECKSUM_SHA256
   }
   tags = [
-    "final:${env}-latest"
+    "final:${env}-${VERSION}"
   ]
 }
