@@ -5,8 +5,7 @@ FROM ubuntu:24.04 AS downloader
 
 RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
-      wget \
-      tar \
+      aria2 \
       ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
@@ -18,8 +17,7 @@ FROM downloader AS mkl-installer
 ARG MKL_URL
 ARG MKL_URL_CHECKSUM_SHA256
 
-RUN wget -O /tmp/mkl-install.x -q "${MKL_URL}" \
- && echo "${MKL_URL_CHECKSUM_SHA256} /tmp/mkl-install.x" | sha256sum --check - \
+RUN aria2c --checksum="sha-256=${MKL_URL_CHECKSUM_SHA256}" -d /tmp -o mkl-install.x "${MKL_URL}" \
  && chmod +x /tmp/mkl-install.x \
  && /tmp/mkl-install.x -a --silent --eula accept --install-dir /opt/intel/mkl \
  && rm -rf /tmp/*
@@ -32,8 +30,7 @@ FROM downloader AS cmake-installer
 ARG CMAKE_URL
 ARG CMAKE_URL_CHECKSUM_SHA256
 
-RUN wget -O /tmp/cmake-install.x -q "${CMAKE_URL}" \
- && echo "${CMAKE_URL_CHECKSUM_SHA256} /tmp/cmake-install.x" | sha256sum --check - \
+RUN aria2c --checksum="sha-256=${CMAKE_URL_CHECKSUM_SHA256}" -d /tmp -o cmake-install.x "${CMAKE_URL}" \
  && chmod +x /tmp/cmake-install.x \
  && mkdir -p /opt/cmake \
  && /tmp/cmake-install.x --prefix=/opt/cmake --skip-license \
@@ -48,11 +45,5 @@ COPY --from=boost-builder /opt/boost/ /usr/
 COPY --from=cmake-installer /opt/cmake/ /usr/
 COPY --from=mkl-installer /opt/intel /opt/intel
 
-# Note: we don't want to deal with entrypoints, let's try to replicate
-# environment changes usually applied by toolset activation scripts like:
-# . /opt/intel/mkl/setvars.sh
-# To look for modifications before and after the activation:
-# $ docker run --rm -it myimage bash -c 'printenv; source /opt/intel/mkl/setvars.sh; echo "---"; printenv'
-ENV PKG_CONFIG_PATH="/opt/intel/mkl/tbb/2023.0/env/../lib/pkgconfig:/opt/intel/mkl/mpi/2021.18/lib/pkgconfig:/opt/intel/mkl/mkl/2026.0/lib/pkgconfig:/opt/intel/mkl/compiler/2026.0/lib/pkgconfig:${PKG_CONFIG_PATH}" \
-    CMAKE_PREFIX_PATH="/opt/intel/mkl/tbb/2023.0/env/..:/opt/intel/mkl/mkl/2026.0/lib/cmake:/opt/intel/mkl/compiler/2026.0:${CMAKE_PREFIX_PATH}" \
-    LD_LIBRARY_PATH="/opt/intel/mkl/tcm/1.5/lib:/opt/intel/mkl/umf/1.1/lib:/opt/intel/mkl/tcm/1.5/env/../lib:/opt/intel/mkl/tbb/2023.0/env/../lib/intel64/gcc4.8:/opt/intel/mkl/mpi/2021.18/opt/mpi/libfabric/lib:/opt/intel/mkl/mpi/2021.18/lib:/opt/intel/mkl/mkl/2026.0/lib:/opt/intel/mkl/compiler/2026.0/opt/compiler/lib:/opt/intel/mkl/compiler/2026.0/lib:${LD_LIBRARY_PATH}"
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
