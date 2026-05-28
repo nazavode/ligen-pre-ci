@@ -26,11 +26,11 @@ RUN dnf -y update \
       wget \
       tar \
       ninja-build \
-      gcc-toolset-${CC_VERSION} \
-      gcc-toolset-${CC_VERSION}-libasan-devel  \
-      gcc-toolset-${CC_VERSION}-liblsan-devel  \
-      gcc-toolset-${CC_VERSION}-libtsan-devel  \
-      gcc-toolset-${CC_VERSION}-libubsan-devel \
+      "gcc-toolset-${CC_VERSION}" \
+      "gcc-toolset-${CC_VERSION}-libasan-devel"  \
+      "gcc-toolset-${CC_VERSION}-liblsan-devel"  \
+      "gcc-toolset-${CC_VERSION}-libtsan-devel"  \
+      "gcc-toolset-${CC_VERSION}-libubsan-devel" \
  && dnf clean all
 
 # Note: we don't want to deal with entrypoints, let's try to replicate
