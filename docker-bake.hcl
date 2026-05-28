@@ -58,9 +58,6 @@ target "base" {
     GCC_VERSION = ccver(env)
     CLANG_VERSION = ccver(env)
   }
-  tags = [
-    "base:${env}-latest"
-  ]
 }
 
 # Generates: boost-debian and boost-rhel
