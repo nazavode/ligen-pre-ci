@@ -52,7 +52,7 @@ jobs:
           source: .
           push: ${{ github.ref == 'refs/heads/master' }}
           vars: |
-            IMAGE=ghcr.io/nazavode/ligen-pre-ci
+            IMAGE=ghcr.io/${{ github.actor }}/ligen-pre-ci
             VERSION=${{ github.sha }}
           set: |
             *.cache-from=type=gha
