@@ -8,6 +8,7 @@ ARG CC_VERSION=00
 
 RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
+      cmake \
       wget \
       ca-certificates \
       ninja-build \

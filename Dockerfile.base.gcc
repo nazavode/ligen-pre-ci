@@ -11,8 +11,8 @@ RUN apt-get update -y \
       wget \
       tar \
       ninja-build \
-      ca-certificates \
       cmake \
+      ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
 # ==========================================
