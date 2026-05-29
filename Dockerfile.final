@@ -23,26 +23,11 @@ RUN aria2c --checksum="sha-256=${MKL_URL_CHECKSUM_SHA256}" -d /tmp -o mkl-instal
  && rm -rf /tmp/*
 
 # ==========================================
-# cmake-installer: installs cmake to /usr
-# ==========================================
-FROM downloader AS cmake-installer
-
-ARG CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-Linux-x86_64.sh"
-ARG CMAKE_URL_CHECKSUM_SHA256="518c76bd18cc4ca5faab891db69b1289dc1bf134f394f0983a19576711b95210" 
-
-RUN aria2c --checksum="sha-256=${CMAKE_URL_CHECKSUM_SHA256}" -d /tmp -o cmake-install.x "${CMAKE_URL}" \
- && chmod +x /tmp/cmake-install.x \
- && mkdir -p /opt/cmake \
- && /tmp/cmake-install.x --prefix=/opt/cmake --skip-license \
- && rm -rf /tmp/*
-
-# ==========================================
 # final stage
 # ==========================================
 FROM base
 
 COPY --from=boost-builder /opt/boost/ /usr/
-COPY --from=cmake-installer /opt/cmake/ /usr/
 COPY --from=mkl-installer /opt/intel /opt/intel
 
 COPY entrypoint.sh /entrypoint.sh
