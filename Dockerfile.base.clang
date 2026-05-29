@@ -7,6 +7,8 @@ FROM debian:trixie AS debian
 ARG CC_VERSION
 ARG ONEAPI_VERSION
 
+COPY docker-entrypoint.d/99-oneapi-setvars.sh /docker-entrypoint.d/
+
 RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
       gpg \

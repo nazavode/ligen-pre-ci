@@ -18,12 +18,8 @@ variable "ENV_TARGETS" {
   ]
 }
 
-# group "default" {
-#   targets = concat([for env in ENV_TARGETS : "final-${env}"], ["docs"])
-# }
-
 group "default" {
-  targets = [for env in ENV_TARGETS : "base-${env}"]
+  targets = concat([for env in ENV_TARGETS : "final-${env}"], ["docs"])
 }
 
 # ==========================================
@@ -72,9 +68,6 @@ target "base" {
     # Note: this is ignored when cc == dpcpp
     ONEAPI_VERSION = "2025.3"
   }
-    tags = [
-    "base:${pretty(env)}-${VERSION}"
-  ]
 }
 
 target "boost" {

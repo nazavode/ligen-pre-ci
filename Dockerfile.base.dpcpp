@@ -21,6 +21,7 @@ FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651 AS rhel
 
 ARG CC_VERSION
 
+COPY docker-entrypoint.d/99-oneapi-setvars.sh /docker-entrypoint.d/
 COPY oneAPI.repo.rhel /etc/yum.repos.d/oneAPI.repo
 COPY cuda.repo.rhel /etc/yum.repos.d/cuda.repo
 COPY --from=configurator /oneAPI.env /oneAPI.env

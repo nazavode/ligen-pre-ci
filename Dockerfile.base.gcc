@@ -7,6 +7,8 @@ FROM gcc:${CC_VERSION} AS debian
 
 ARG ONEAPI_VERSION
 
+COPY docker-entrypoint.d/99-oneapi-setvars.sh /docker-entrypoint.d/
+
 RUN apt-get update -y \
  && apt-get install -y --no-install-recommends \
       gpg \
@@ -32,6 +34,8 @@ ARG CC_VERSION
 ARG ONEAPI_VERSION
 
 COPY oneAPI.repo.rhel /etc/yum.repos.d/oneAPI.repo
+COPY docker-entrypoint.d/00-rhel-gcc-toolset-14.sh /docker-entrypoint.d/
+COPY docker-entrypoint.d/99-oneapi-setvars.sh /docker-entrypoint.d/
 
 RUN dnf -y install \
       procps-ng \

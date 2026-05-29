@@ -1,6 +1,6 @@
 FROM base
 
 COPY --from=boost-builder /opt/boost/ /usr/
+COPY docker-entrypoint.sh /docker-entrypoint.sh
 
-COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
