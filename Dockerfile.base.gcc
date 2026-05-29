@@ -21,8 +21,7 @@ FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651 AS rhel
 
 ARG CC_VERSION
 
-RUN dnf -y update \
- && dnf -y install \
+RUN dnf -y install \
       wget \
       tar \
       ninja-build \

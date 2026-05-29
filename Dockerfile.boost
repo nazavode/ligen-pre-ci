@@ -1,50 +1,16 @@
-# ==========================================
-# Downloader stage
-# ==========================================
-FROM alpine:latest AS downloader
+FROM base
 
+ARG BOOST_BUILD_TOOLSET
 ARG BOOST_URL="https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz" 
 ARG BOOST_URL_CHECKSUM_SHA256="f55c340aa49763b1925ccf02b2e83f35fdcf634c9d5164a2acb87540173c741d"
 
-RUN apk add aria2 \
- && aria2c --checksum="sha-256=${BOOST_URL_CHECKSUM_SHA256}" -d /tmp -o boost.archive "${BOOST_URL}" \
- && mkdir -p /opt/boost.src \
- && tar xf /tmp/boost.archive -C /opt/boost.src/ --strip-components 1 \
- && rm -rf /tmp/* \
- && rm -rf /var/cache/apk/*
-
-# ==========================================
-# Build flags stage
-# ==========================================
-FROM alpine:latest AS configurator
-
-ARG BOOST_BUILD_TOOLSET
-
-RUN mkdir -p /opt \
- && touch /opt/boost.env \
- && if [ "${BOOST_BUILD_TOOLSET}" = "clang" ]; then \
-      echo "export BOOST_CXXFLAGS='-stdlib=libc++'" >> /opt/boost.env; \
-      echo "export BOOST_LDFLAGS='-stdlib=libc++'" >> /opt/boost.env; \
-    fi \
-  # dpcpp depends on system's default gcc11, b2 is not aware of dpcpp anyways:
-  && if [ "${BOOST_BUILD_TOOLSET}" = "dpcpp" ]; then \
-      echo "export BOOST_BUILD_TOOLSET=gcc" >> /opt/boost.env; \
-    else \
-      echo "export BOOST_BUILD_TOOLSET=${BOOST_BUILD_TOOLSET}" >> /opt/boost.env; \
-    fi
-
-# ==========================================
-# Builder stage
-# ==========================================
-
-FROM base
-
-COPY --from=downloader /opt/boost.src /tmp/boost.src
-COPY --from=configurator /opt/boost.env /tmp/boost.env
-
-RUN cd /tmp/boost.src \
- && . /tmp/boost.env \
+RUN wget -qO /tmp/boost.archive "${BOOST_URL}" \
+ && echo "${BOOST_URL_CHECKSUM_SHA256} /tmp/boost.archive" | sha256sum -c - \
+ && mkdir -p /tmp/boost.src \
+ && tar xf /tmp/boost.archive -C /tmp/boost.src --strip-components 1 \
+ && cd /tmp/boost.src \
+ && { [ "${BOOST_BUILD_TOOLSET}" != "clang" ] || { export BOOST_CXXFLAGS='-stdlib=libc++' BOOST_LDFLAGS='-stdlib=libc++'; }; } \
+ && { [ "${BOOST_BUILD_TOOLSET}" != "dpcpp" ] || export BOOST_BUILD_TOOLSET=gcc; } \
  && ./bootstrap.sh --with-toolset="${BOOST_BUILD_TOOLSET}" --with-libraries=graph,program_options,container \
- && ./b2 -d0 cxxflags="${BOOST_CXXFLAGS}" linkflags="${BOOST_LDFLAGS}" toolset="${BOOST_BUILD_TOOLSET}" cxxstd=20 --with-graph --with-program_options --with-container stage \
  && ./b2 -d0 cxxflags="${BOOST_CXXFLAGS}" linkflags="${BOOST_LDFLAGS}" toolset="${BOOST_BUILD_TOOLSET}" cxxstd=20 --with-graph --with-program_options --with-container --prefix=/opt/boost install \
  && rm -rf /tmp/*
