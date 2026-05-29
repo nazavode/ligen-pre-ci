@@ -1,16 +1,6 @@
 FROM base
 
-ARG MKL_URL="https://registrationcenter-download.intel.com/akdlm/IRC_NAS/db60f483-f02e-4f7e-9bcd-5e01dba97444/intel-onemkl-2026.0.0.909_offline.sh"
-ARG MKL_URL_CHECKSUM_SHA256="f63fd6ce3a374993caa0482fec0a3b9f2c312beeabff82009ab51fca90c97225"
-
-RUN wget -qO /tmp/mkl-install.x "${MKL_URL}" \
- && echo "${MKL_URL_CHECKSUM_SHA256} /tmp/mkl-install.x" | sha256sum -c - \
- && chmod +x /tmp/mkl-install.x \
- && /tmp/mkl-install.x -a --silent --eula accept \
- && rm -fr /var/intel \
- && rm -fr /tmp/*
+COPY --from=boost-builder /opt/boost/ /usr/
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-
-COPY --from=boost-builder /opt/boost/ /usr/

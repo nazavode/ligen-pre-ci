@@ -14,12 +14,16 @@ variable "ENV_TARGETS" {
     "debian-gcc14",
     "rhel-gcc14",
     "debian-clang20",
-    "rhel-dpcpp2025_3_2"
+    "rhel-dpcpp2025_3"
   ]
 }
 
+# group "default" {
+#   targets = concat([for env in ENV_TARGETS : "final-${env}"], ["docs"])
+# }
+
 group "default" {
-  targets = concat([for env in ENV_TARGETS : "final-${env}"], ["docs"])
+  targets = [for env in ENV_TARGETS : "base-${env}"]
 }
 
 # ==========================================
@@ -63,8 +67,14 @@ target "base" {
   dockerfile = "Dockerfile.base.${cc(env)}"
   target     = os(env)
   args = {
-    CC_VERSION = ccver(env)
+    CC_VERSION     = pretty(ccver(env))
+    # When cc != dpcpp, we need a oneAPI version to install MKL from.
+    # Note: this is ignored when cc == dpcpp
+    ONEAPI_VERSION = "2025.3"
   }
+    tags = [
+    "base:${pretty(env)}-${VERSION}"
+  ]
 }
 
 target "boost" {

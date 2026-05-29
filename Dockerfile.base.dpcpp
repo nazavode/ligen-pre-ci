@@ -5,42 +5,37 @@ FROM alpine:latest AS configurator
 
 ARG CC_VERSION
 
-COPY dpcpp.json /dpcpp.json
+COPY oneAPI.json /oneAPI.json
 
 RUN apk add jq \
- && DPCPP_URL=$(jq ".dpcpp${CC_VERSION}.DPCPP_URL" /dpcpp.json) \
- && DPCPP_URL_CHECKSUM_SHA256=$(jq ".dpcpp${CC_VERSION}.DPCPP_URL_CHECKSUM_SHA256" /dpcpp.json) \
- && DPCPP_NVIDIA_URL=$(jq ".dpcpp${CC_VERSION}.DPCPP_NVIDIA_URL" /dpcpp.json) \
- && DPCPP_NVIDIA_URL_CHECKSUM_SHA256=$(jq ".dpcpp${CC_VERSION}.DPCPP_NVIDIA_URL_CHECKSUM_SHA256" /dpcpp.json) \
+ && DPCPP_NVIDIA_URL=$(jq ".\"${CC_VERSION}\".DPCPP_NVIDIA_URL" /oneAPI.json) \
+ && DPCPP_NVIDIA_URL_CHECKSUM_SHA256=$(jq ".\"${CC_VERSION}\".DPCPP_NVIDIA_URL_CHECKSUM_SHA256" /oneAPI.json) \
  && echo -e "\
-export DPCPP_URL=${DPCPP_URL}\n\
-export DPCPP_URL_CHECKSUM_SHA256=${DPCPP_URL_CHECKSUM_SHA256}\n\
 export DPCPP_NVIDIA_URL=${DPCPP_NVIDIA_URL}\n\
-export DPCPP_NVIDIA_URL_CHECKSUM_SHA256=${DPCPP_NVIDIA_URL_CHECKSUM_SHA256}\n" >> /dpcpp.env
+export DPCPP_NVIDIA_URL_CHECKSUM_SHA256=${DPCPP_NVIDIA_URL_CHECKSUM_SHA256}\n" >> /oneAPI.env
 
 # ==========================================
 # RHEL + dpcpp + cuda
 # ==========================================
 FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651 AS rhel
 
-COPY --from=configurator /dpcpp.env /dpcpp.env
+ARG CC_VERSION
 
-RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo \
- && dnf -y install \
+COPY oneAPI.repo.rhel /etc/yum.repos.d/oneAPI.repo
+COPY cuda.repo.rhel /etc/yum.repos.d/cuda.repo
+COPY --from=configurator /oneAPI.env /oneAPI.env
+
+RUN dnf -y install \
       procps-ng \
       wget \
       tar \
       ninja-build \
       cmake \
       cuda-minimal-build-12-1 \
- && cat /dpcpp.env \
- && . /dpcpp.env \
- # DPCPP
- && wget -qO /tmp/oneapi-dpcpp-install.sh "${DPCPP_URL}" \
- && echo "${DPCPP_URL_CHECKSUM_SHA256} /tmp/oneapi-dpcpp-install.sh" | sha256sum -c - \
- && chmod +x /tmp/oneapi-dpcpp-install.sh \
- && /tmp/oneapi-dpcpp-install.sh -a --silent --eula accept \
- # NVIDIA Plugin
+      "intel-oneapi-mkl-classic-devel-${CC_VERSION}" \
+      "intel-oneapi-compiler-dpcpp-cpp-${CC_VERSION}" \
+ # NVIDIA plugin for dpcpp
+ && . /oneAPI.env \
  && wget -qO /tmp/oneapi-cuda-install.sh "${DPCPP_NVIDIA_URL}" \
  && echo "${DPCPP_NVIDIA_URL_CHECKSUM_SHA256} /tmp/oneapi-cuda-install.sh" | sha256sum -c - \
  && chmod +x /tmp/oneapi-cuda-install.sh \

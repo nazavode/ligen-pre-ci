@@ -1,0 +1,6 @@
+{
+    "2025.3": {
+        "DPCPP_NVIDIA_URL": "https://github.com/unisa-hpc/oneapi-plugins/releases/download/v2025.3/oneapi-ur-cuda-linux-x86_64-2025.3.sh",
+        "DPCPP_NVIDIA_URL_CHECKSUM_SHA256": "8cbf18ab93bb1f2b2145aa591814778f1434e46603641f9b13f6fc70f2f531dc"
+    }
+}
