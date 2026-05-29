@@ -1,0 +1,50 @@
+# ==========================================
+# Configurator stage
+# ==========================================
+FROM alpine:latest AS configurator
+
+ARG CC_VERSION
+
+COPY dpcpp.json /dpcpp.json
+
+RUN apk add jq \
+ && DPCPP_URL=$(jq ".dpcpp${CC_VERSION}.DPCPP_URL" /dpcpp.json) \
+ && DPCPP_URL_CHECKSUM_SHA256=$(jq ".dpcpp${CC_VERSION}.DPCPP_URL_CHECKSUM_SHA256" /dpcpp.json) \
+ && DPCPP_NVIDIA_URL=$(jq ".dpcpp${CC_VERSION}.DPCPP_NVIDIA_URL" /dpcpp.json) \
+ && DPCPP_NVIDIA_URL_CHECKSUM_SHA256=$(jq ".dpcpp${CC_VERSION}.DPCPP_NVIDIA_URL_CHECKSUM_SHA256" /dpcpp.json) \
+ && echo -e "\
+export DPCPP_URL=${DPCPP_URL}\n\
+export DPCPP_URL_CHECKSUM_SHA256=${DPCPP_URL_CHECKSUM_SHA256}\n\
+export DPCPP_NVIDIA_URL=${DPCPP_NVIDIA_URL}\n\
+export DPCPP_NVIDIA_URL_CHECKSUM_SHA256=${DPCPP_NVIDIA_URL_CHECKSUM_SHA256}\n" >> /dpcpp.env
+
+# ==========================================
+# RHEL + dpcpp + cuda
+# ==========================================
+FROM registry.access.redhat.com/ubi9/ubi AS rhel
+
+COPY --from=configurator /dpcpp.env /dpcpp.env
+
+RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo \
+ && dnf -y update \
+ && dnf -y install \
+      wget \
+      cuda-minimal-build-12-1 \
+ && cat /dpcpp.env \
+ && . /dpcpp.env \
+ # DPCPP
+ && wget -qO /tmp/oneapi-dpcpp-install.sh "${DPCPP_URL}" \
+ && echo "${DPCPP_URL_CHECKSUM_SHA256} /tmp/oneapi-dpcpp-install.sh" | sha256sum -c - \
+ && chmod +x /tmp/oneapi-dpcpp-install.sh \
+ && /tmp/oneapi-dpcpp-install.sh -a --silent --eula accept \
+ # NVIDIA Plugin
+ && wget -qO /tmp/oneapi-cuda-install.sh "${DPCPP_NVIDIA_URL}" \
+ && echo "${DPCPP_NVIDIA_URL_CHECKSUM_SHA256} /tmp/oneapi-cuda-install.sh" | sha256sum -c - \
+ && chmod +x /tmp/oneapi-cuda-install.sh \
+ && /tmp/oneapi-cuda-install.sh --oneapi-root /opt/intel/oneapi \
+ # cleanup
+ && dnf clean -y all \
+ && rm -fr /tmp/*
+
+# COPY entrypoint.sh /entrypoint.sh
+# ENTRYPOINT ["/entrypoint.sh"]

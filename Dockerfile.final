@@ -14,8 +14,8 @@ RUN apt-get update -y \
 # ==========================================
 FROM downloader AS mkl-installer
 
-ARG MKL_URL
-ARG MKL_URL_CHECKSUM_SHA256
+ARG MKL_URL="https://registrationcenter-download.intel.com/akdlm/IRC_NAS/db60f483-f02e-4f7e-9bcd-5e01dba97444/intel-onemkl-2026.0.0.909_offline.sh"
+ARG MKL_URL_CHECKSUM_SHA256="f63fd6ce3a374993caa0482fec0a3b9f2c312beeabff82009ab51fca90c97225"
 
 RUN aria2c --checksum="sha-256=${MKL_URL_CHECKSUM_SHA256}" -d /tmp -o mkl-install.x "${MKL_URL}" \
  && chmod +x /tmp/mkl-install.x \
@@ -27,8 +27,8 @@ RUN aria2c --checksum="sha-256=${MKL_URL_CHECKSUM_SHA256}" -d /tmp -o mkl-instal
 # ==========================================
 FROM downloader AS cmake-installer
 
-ARG CMAKE_URL
-ARG CMAKE_URL_CHECKSUM_SHA256
+ARG CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-Linux-x86_64.sh"
+ARG CMAKE_URL_CHECKSUM_SHA256="518c76bd18cc4ca5faab891db69b1289dc1bf134f394f0983a19576711b95210" 
 
 RUN aria2c --checksum="sha-256=${CMAKE_URL_CHECKSUM_SHA256}" -d /tmp -o cmake-install.x "${CMAKE_URL}" \
  && chmod +x /tmp/cmake-install.x \

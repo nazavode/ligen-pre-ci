@@ -1,0 +1,8 @@
+{
+    "dpcpp2025_3_2": {
+        "DPCPP_URL": "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/0d61d48a-4fe8-4cb2-bd9d-94d2c19c6227/intel-dpcpp-cpp-compiler-2025.3.2.26_offline.sh",
+        "DPCPP_URL_CHECKSUM_SHA256": "37d6c9c22f90fbb4d2072fd45d0284f2b6b1ffd030d699e1e7a669087d093396",
+        "DPCPP_NVIDIA_URL": "https://github.com/unisa-hpc/oneapi-plugins/releases/download/v2025.3/oneapi-ur-cuda-linux-x86_64-2025.3.sh",
+        "DPCPP_NVIDIA_URL_CHECKSUM_SHA256": "8cbf18ab93bb1f2b2145aa591814778f1434e46603641f9b13f6fc70f2f531dc"
+    }
+}

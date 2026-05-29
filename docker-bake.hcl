@@ -13,7 +13,8 @@ variable "ENV_TARGETS" {
     "debian-gcc11",
     "debian-gcc14",
     "rhel-gcc14",
-    "debian-clang20"
+    "debian-clang20",
+    "rhel-dpcpp2025_3_2"
   ]
 }
 
@@ -41,7 +42,14 @@ function "cc" {
 # ccver(debian-gcc11) → 11
 function "ccver" {
   params = [env]
-  result = regex("[0-9]+$",  split("-", env)[1])
+  result = regex("[0-9]+[_0-9]*$", split("-", env)[1])
+}
+
+# pretty(debian-gcc11) → debian-gcc11
+# pretty(rhel-dpcpp2025_3_2) → rhel-dpcpp2025.3.2
+function "pretty" {
+  params = [env]
+  result = replace(env, "_", ".")
 }
 
 # ==========================================
@@ -55,7 +63,7 @@ target "base" {
   dockerfile = "Dockerfile.base.${cc(env)}"
   target     = os(env)
   args = {
-    CC_VERSION   = ccver(env)
+    CC_VERSION = ccver(env)
   }
 }
 
@@ -69,8 +77,6 @@ target "boost" {
   }
   args = {
     BOOST_BUILD_TOOLSET       = cc(env)
-    BOOST_URL                 = "https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz" 
-    BOOST_URL_CHECKSUM_SHA256 = "f55c340aa49763b1925ccf02b2e83f35fdcf634c9d5164a2acb87540173c741d"
   }
 }
 
@@ -87,13 +93,7 @@ target "final" {
     base          = "target:base-${env}"
     boost-builder = "target:boost-${env}"
   }
-  args = {
-    CMAKE_URL                 = "https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-Linux-x86_64.sh"
-    CMAKE_URL_CHECKSUM_SHA256 = "518c76bd18cc4ca5faab891db69b1289dc1bf134f394f0983a19576711b95210" 
-    MKL_URL                   = "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/db60f483-f02e-4f7e-9bcd-5e01dba97444/intel-onemkl-2026.0.0.909_offline.sh"
-    MKL_URL_CHECKSUM_SHA256   = "f63fd6ce3a374993caa0482fec0a3b9f2c312beeabff82009ab51fca90c97225"
-  }
   tags = [
-    "${IMAGE}:${env}-${VERSION}"
+    "${IMAGE}:${pretty(env)}-${VERSION}"
   ]
 }

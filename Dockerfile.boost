@@ -3,8 +3,8 @@
 # ==========================================
 FROM alpine:latest AS downloader
 
-ARG BOOST_URL
-ARG BOOST_URL_CHECKSUM_SHA256
+ARG BOOST_URL="https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz" 
+ARG BOOST_URL_CHECKSUM_SHA256="f55c340aa49763b1925ccf02b2e83f35fdcf634c9d5164a2acb87540173c741d"
 
 RUN apk add aria2 \
  && aria2c --checksum="sha-256=${BOOST_URL_CHECKSUM_SHA256}" -d /tmp -o boost.archive "${BOOST_URL}" \
@@ -16,7 +16,7 @@ RUN apk add aria2 \
 # ==========================================
 # Build flags stage
 # ==========================================
-FROM alpine:latest AS flagger
+FROM alpine:latest AS configurator
 
 ARG BOOST_BUILD_TOOLSET
 
@@ -25,6 +25,12 @@ RUN mkdir -p /opt \
  && if [ "${BOOST_BUILD_TOOLSET}" = "clang" ]; then \
       echo "export BOOST_CXXFLAGS='-stdlib=libc++'" >> /opt/boost.env; \
       echo "export BOOST_LDFLAGS='-stdlib=libc++'" >> /opt/boost.env; \
+    fi \
+  # dpcpp depends on system's default gcc11, b2 is not aware of dpcpp anyways:
+  && if [ "${BOOST_BUILD_TOOLSET}" = "dpcpp" ]; then \
+      echo "export BOOST_BUILD_TOOLSET=gcc" >> /opt/boost.env; \
+    else \
+      echo "export BOOST_BUILD_TOOLSET=${BOOST_BUILD_TOOLSET}" >> /opt/boost.env; \
     fi
 
 # ==========================================
@@ -33,10 +39,8 @@ RUN mkdir -p /opt \
 
 FROM base
 
-ARG BOOST_BUILD_TOOLSET
-
 COPY --from=downloader /opt/boost.src /tmp/boost.src
-COPY --from=flagger /opt/boost.env /tmp/boost.env
+COPY --from=configurator /opt/boost.env /tmp/boost.env
 
 RUN cd /tmp/boost.src \
  && . /tmp/boost.env \
