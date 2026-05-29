@@ -19,7 +19,7 @@ variable "ENV_TARGETS" {
 }
 
 group "default" {
-  targets = [for env in ENV_TARGETS : "final-${env}"]
+  targets = concat([for env in ENV_TARGETS : "final-${env}"], ["docs"])
 }
 
 # ==========================================
@@ -95,5 +95,17 @@ target "final" {
   }
   tags = [
     "${IMAGE}:${pretty(env)}-${VERSION}"
+  ]
+}
+
+# ==========================================
+# Docs target
+# ==========================================
+
+target "docs" {
+  platforms  = ["linux/amd64"]
+  dockerfile = "Dockerfile.docs"
+  tags = [
+    "${IMAGE}:docs-${VERSION}"
   ]
 }
