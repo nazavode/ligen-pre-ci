@@ -79,7 +79,7 @@ target "boost" {
     base = "target:base-${env}"
   }
   args = {
-    BOOST_BUILD_TOOLSET       = cc(env)
+    BOOST_BUILD_TOOLSET = cc(env)
   }
 }
 
