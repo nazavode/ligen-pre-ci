@@ -17,12 +17,12 @@ RUN apt-get update -y \
 # ==========================================
 # RHEL 9 + gccXX (from official toolsets)
 # ==========================================
-FROM registry.access.redhat.com/ubi9/ubi AS rhel
+FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651 AS rhel
 
 ARG CC_VERSION
 
 RUN dnf -y update \
- && dnf install -y \
+ && dnf -y install \
       wget \
       tar \
       ninja-build \
@@ -31,7 +31,7 @@ RUN dnf -y update \
       "gcc-toolset-${CC_VERSION}-liblsan-devel"  \
       "gcc-toolset-${CC_VERSION}-libtsan-devel"  \
       "gcc-toolset-${CC_VERSION}-libubsan-devel" \
- && dnf clean all
+ && dnf -y clean all
 
 # Note: we don't want to deal with entrypoints, let's try to replicate
 # environment changes usually applied by toolset activation scripts like:

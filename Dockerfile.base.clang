@@ -16,7 +16,7 @@ RUN apt-get update -y \
 deb http://apt.llvm.org/trixie/ llvm-toolchain-trixie-${CC_VERSION} main\n\
 deb-src http://apt.llvm.org/trixie/ llvm-toolchain-trixie-${CC_VERSION} main\n" >> /etc/apt/sources.list \
  && apt-get update -y \
- && apt-get install -y \
+ && apt-get install -y --no-install-recommends \
       "clang-${CC_VERSION}" \
       "clang-tools-${CC_VERSION}" \
       "clang-format-${CC_VERSION}" \

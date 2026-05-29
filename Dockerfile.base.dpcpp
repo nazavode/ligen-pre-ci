@@ -21,12 +21,11 @@ export DPCPP_NVIDIA_URL_CHECKSUM_SHA256=${DPCPP_NVIDIA_URL_CHECKSUM_SHA256}\n" >
 # ==========================================
 # RHEL + dpcpp + cuda
 # ==========================================
-FROM registry.access.redhat.com/ubi9/ubi AS rhel
+FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651 AS rhel
 
 COPY --from=configurator /dpcpp.env /dpcpp.env
 
 RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo \
- && dnf -y update \
  && dnf -y install \
       wget \
       cuda-minimal-build-12-1 \
@@ -43,7 +42,7 @@ RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/
  && chmod +x /tmp/oneapi-cuda-install.sh \
  && /tmp/oneapi-cuda-install.sh --oneapi-root /opt/intel/oneapi \
  # cleanup
- && dnf clean -y all \
+ && dnf -y clean all \
  && rm -fr /tmp/*
 
 # COPY entrypoint.sh /entrypoint.sh
