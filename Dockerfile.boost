@@ -4,7 +4,7 @@ ARG BOOST_BUILD_TOOLSET
 ARG BOOST_URL="https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz" 
 ARG BOOST_URL_CHECKSUM_SHA256="f55c340aa49763b1925ccf02b2e83f35fdcf634c9d5164a2acb87540173c741d"
 
-COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY docker-entrypoint.sh /
 
 RUN wget -qO /tmp/boost.archive "${BOOST_URL}" \
  && echo "${BOOST_URL_CHECKSUM_SHA256} /tmp/boost.archive" | sha256sum -c - \

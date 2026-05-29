@@ -33,7 +33,7 @@ FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651 AS rhel
 ARG CC_VERSION
 ARG ONEAPI_VERSION
 
-COPY oneAPI.repo.rhel /etc/yum.repos.d/oneAPI.repo
+COPY rhel/oneAPI.repo /etc/yum.repos.d/
 COPY docker-entrypoint.d/00-rhel-gcc-toolset-14.sh /docker-entrypoint.d/
 COPY docker-entrypoint.d/99-oneapi-setvars.sh /docker-entrypoint.d/
 
