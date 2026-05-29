@@ -23,6 +23,7 @@ FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651 AS rhel
 ARG CC_VERSION
 
 RUN dnf -y install \
+      procps-ng \
       wget \
       tar \
       ninja-build \
@@ -33,15 +34,3 @@ RUN dnf -y install \
       "gcc-toolset-${CC_VERSION}-libtsan-devel"  \
       "gcc-toolset-${CC_VERSION}-libubsan-devel" \
  && dnf -y clean all
-
-# Note: we don't want to deal with entrypoints, let's try to replicate
-# environment changes usually applied by toolset activation scripts like:
-# . /opt/rh/gcc-toolset-14/enable
-# To look for modifications before and after the activation:
-# $ docker run --rm -it myimage bash -c 'printenv; source /opt/rh/gcc-toolset-14/enable; echo "---"; printenv'
-ENV PKG_CONFIG_PATH="/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/lib64/pkgconfig:${PKG_CONFIG_PATH}" \
-    MANPATH="/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/share/man:${MANPATH}" \
-    INFOPATH="/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/share/info:${INFOPATH}" \
-    LD_LIBRARY_PATH="/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/lib64:/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/lib:/usr/lib:/usr/lib64:${LD_LIBRARY_PATH}" \
-    PCP_DIR="/opt/rh/gcc-toolset-${CC_VERSION}/root:${PCP_DIR}" \
-    PATH="/opt/rh/gcc-toolset-${CC_VERSION}/root/usr/bin:${PATH}"

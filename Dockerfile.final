@@ -7,6 +7,7 @@ RUN wget -qO /tmp/mkl-install.x "${MKL_URL}" \
  && echo "${MKL_URL_CHECKSUM_SHA256} /tmp/mkl-install.x" | sha256sum -c - \
  && chmod +x /tmp/mkl-install.x \
  && /tmp/mkl-install.x -a --silent --eula accept \
+ && rm -fr /var/intel \
  && rm -fr /tmp/*
 
 COPY entrypoint.sh /entrypoint.sh
