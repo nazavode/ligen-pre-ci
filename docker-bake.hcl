@@ -97,7 +97,8 @@ target "final" {
     boost-builder = "target:boost-${env}"
   }
   tags = [
-    "${IMAGE}:${pretty(env)}-${VERSION}"
+    "${IMAGE}:${pretty(env)}-${VERSION}",
+    "${IMAGE}:${pretty(env)}-latest"
   ]
 }
 
@@ -109,6 +110,7 @@ target "docs" {
   platforms  = ["linux/amd64"]
   dockerfile = "Dockerfile.docs"
   tags = [
-    "${IMAGE}:docs-${VERSION}"
+    "${IMAGE}:docs-${VERSION}",
+    "${IMAGE}:docs-latest"
   ]
 }
