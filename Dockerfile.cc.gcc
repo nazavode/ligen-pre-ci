@@ -12,6 +12,8 @@ RUN dnf -y install \
       "gcc-toolset-${CC_VERSION}-libubsan-devel" \
  && dnf -y clean all
 
+ENV CC=gcc CXX=g++
+
 # ======================================================================
 # RHEL ships gcc11 as the system's default compiler and not as a toolset,
 # we need to specialize for it.
@@ -20,3 +22,5 @@ FROM base AS rhel-gcc11
 
 RUN dnf -y install gcc g++ libasan libubsan libtsan \
  && dnf -y clean all
+
+ENV CC=gcc CXX=g++

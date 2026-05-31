@@ -38,3 +38,5 @@ RUN dnf -y install \
  # cleanup
  && dnf -y clean all \
  && rm -fr /tmp/*
+
+ENV CC=icx CXX=icpx
