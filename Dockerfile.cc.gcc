@@ -18,5 +18,5 @@ RUN dnf -y install \
 # ======================================================================
 FROM base AS rhel-gcc11
 
-RUN dnf -y install gcc g++ \
+RUN dnf -y install gcc g++ libasan libubsan libtsan \
  && dnf -y clean all
