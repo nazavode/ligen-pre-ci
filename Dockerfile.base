@@ -10,6 +10,7 @@ RUN apt-get update -y \
       tar \
       ninja-build \
       cmake \
+      ccache \
       # needed to add repos:
       gpg \
       # needed by gitlab runners:
@@ -23,6 +24,9 @@ RUN apt-get update -y \
 # ==========================================
 FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651 AS rhel
 
+ARG CCACHE_URL="https://github.com/ccache/ccache/releases/download/v4.13.6/ccache-4.13.6-linux-x86_64-glibc.tar.gz"
+ARG CCACHE_URL_CHECKSUM_SHA256="567b1b648411819590f918f045218c92da14418bdec3b30db94a3b4f5d77cf13"
+
 RUN dnf -y install \
       wget \
       tar \
@@ -32,4 +36,11 @@ RUN dnf -y install \
       git \
       # needed by Intel's own setvars scripts:
       procps-ng \
- && dnf -y clean all
+ # ccache not in repos:
+ && wget -qO /tmp/ccache.archive "${CCACHE_URL}" \
+ && echo "${CCACHE_URL_CHECKSUM_SHA256} /tmp/ccache.archive" | sha256sum -c - \
+ && mkdir -p /tmp/ccache.bin \
+ && tar xf /tmp/ccache.archive -C /tmp/ccache.bin --strip-components 1 \
+ && /tmp/ccache.bin/install.sh --prefix=/usr \
+ && dnf -y clean all \
+ && rm -fr /tmp/*
