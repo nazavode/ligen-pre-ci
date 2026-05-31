@@ -17,10 +17,14 @@ deb-src http://apt.llvm.org/trixie/ llvm-toolchain-trixie-${CC_VERSION} main\n" 
       "libc++abi-${CC_VERSION}-dev" \
       "lld-${CC_VERSION}" \
       "llvm-${CC_VERSION}-linker-tools" \
+      # Needed for llvm-as and llvm-ar, otherwise lto w/lld doesn't work:
+      "llvm-${CC_VERSION}" \
  && update-alternatives \
       --install /usr/bin/clang           clang           "/usr/bin/clang-${CC_VERSION}" 200 \
       --slave   /usr/bin/clang++         clang++         "/usr/bin/clang++-${CC_VERSION}" \
       --slave   /usr/bin/lld             lld             "/usr/bin/lld-${CC_VERSION}" \
+      --slave   /usr/bin/llvm-ar         llvm-ar         "/usr/bin/llvm-ar-${CC_VERSION}" \
+      --slave   /usr/bin/llvm-as         llvm-as         "/usr/bin/llvm-as-${CC_VERSION}" \
       --slave   /usr/bin/clang-tidy      clang-tidy      "/usr/bin/clang-tidy-${CC_VERSION}" \
       --slave   /usr/bin/clang-format    clang-format    "/usr/bin/clang-format-${CC_VERSION}" \
       --slave   /usr/bin/llvm-symbolizer llvm-symbolizer "/usr/bin/llvm-symbolizer-${CC_VERSION}" \
