@@ -1,6 +1,41 @@
-FROM base
+# ==========================================
+# debian + mkl
+# ==========================================
+FROM base AS debian
 
-COPY --from=boost-builder /opt/boost/ /usr/
+ARG ONEAPI_VERSION
+
+# Copy deps built from sources
+COPY --from=boost /opt/boost/ /usr/
+# Enable docker-entrypoint.d
 COPY docker-entrypoint.sh /
+COPY docker-entrypoint.d/99-oneapi-setvars.sh /docker-entrypoint.d/
+
+RUN wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor > /usr/share/keyrings/oneapi-archive-keyring.gpg \
+ && echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" > /etc/apt/sources.list.d/oneAPI.list \
+ && apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+      "intel-oneapi-mkl-classic-devel-${ONEAPI_VERSION}" \
+ && rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+# ==========================================
+# rhel + mkl
+# ==========================================
+FROM base AS rhel
+
+ARG ONEAPI_VERSION
+
+COPY rhel/oneAPI.repo /etc/yum.repos.d/
+
+# Copy deps built from sources
+COPY --from=boost /opt/boost/ /usr/
+# Enable docker-entrypoint.d
+COPY docker-entrypoint.sh /
+COPY docker-entrypoint.d/99-oneapi-setvars.sh /docker-entrypoint.d/
+
+RUN dnf -y install "intel-oneapi-mkl-classic-devel-${ONEAPI_VERSION}" \
+ && dnf -y clean all
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

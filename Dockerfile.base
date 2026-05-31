@@ -1,0 +1,35 @@
+# ==========================================
+# debian
+# ==========================================
+FROM debian:trixie AS debian
+
+RUN apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+      wget \
+      ca-certificates \
+      tar \
+      ninja-build \
+      cmake \
+      # needed to add repos:
+      gpg \
+      # needed by gitlab runners:
+      git \
+      # needed by Intel's own setvars scripts:
+      procps \
+ && rm -rf /var/lib/apt/lists/*
+
+# ==========================================
+# rhel
+# ==========================================
+FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651 AS rhel
+
+RUN dnf -y install \
+      wget \
+      tar \
+      ninja-build \
+      cmake \
+      # needed by gitlab runners:
+      git \
+      # needed by Intel's own setvars scripts:
+      procps-ng \
+ && dnf -y clean all

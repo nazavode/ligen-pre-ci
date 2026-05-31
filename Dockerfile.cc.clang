@@ -1,33 +1,13 @@
-# ==========================================
-# debian + clangXX
-# ==========================================
-
-FROM debian:trixie AS debian
+FROM base AS debian
 
 ARG CC_VERSION
-ARG ONEAPI_VERSION
 
-COPY docker-entrypoint.d/99-oneapi-setvars.sh /docker-entrypoint.d/
-
-RUN apt-get update -y \
- && apt-get install -y --no-install-recommends \
-      gpg \
-      wget \
-      ca-certificates \
- # oneAPI repo
- && wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor > /usr/share/keyrings/oneapi-archive-keyring.gpg \
- && echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" > /etc/apt/sources.list.d/oneAPI.list \
- # LLVM repo
- && wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key > /etc/apt/trusted.gpg.d/apt.llvm.org.asc \
+RUN wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key > /etc/apt/trusted.gpg.d/apt.llvm.org.asc \
  && echo "\
 deb http://apt.llvm.org/trixie/ llvm-toolchain-trixie-${CC_VERSION} main\n\
 deb-src http://apt.llvm.org/trixie/ llvm-toolchain-trixie-${CC_VERSION} main\n" >> /etc/apt/sources.list \
  && apt-get update -y \
  && apt-get install -y --no-install-recommends \
-      procps \
-      cmake \
-      ninja-build \
-      "intel-oneapi-mkl-classic-devel-${ONEAPI_VERSION}" \
       "clang-${CC_VERSION}" \
       "clang-tools-${CC_VERSION}" \
       "clang-format-${CC_VERSION}" \

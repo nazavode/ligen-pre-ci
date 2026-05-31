@@ -8,10 +8,16 @@ variable "VERSION" {
   default = "latest" 
 }
 
+variable "ENV_OS" {
+  default = [
+    "debian",
+    "rhel",
+  ]
+}
+
 variable "ENV_TARGETS" {
   default = [
-    "debian-gcc11",
-    "debian-gcc14",
+    "rhel-gcc11",
     "rhel-gcc14",
     "debian-clang20",
     "rhel-dpcpp2025_3"
@@ -57,18 +63,31 @@ function "pretty" {
 # ==========================================
 
 target "base" {
+  matrix     = { env = ENV_OS }
+  platforms  = ["linux/amd64"]
+  name       = "base-${os(env)}"
+  dockerfile = "Dockerfile.base"
+  target     = os(env)
+}
+
+target "cc" {
   matrix     = { env = ENV_TARGETS }
   platforms  = ["linux/amd64"]
-  name       = "base-${env}"
-  dockerfile = "Dockerfile.base.${cc(env)}"
-  target     = os(env)
+  name       = "cc-${env}"
+  dockerfile = "Dockerfile.cc.${cc(env)}"
+  # RHEL ships gcc11 as the system's default compiler and not as a toolset:
+  target     = env == "rhel-gcc11" ? "rhel-gcc11" : os(env)
+  contexts = {
+    base = "target:base-${os(env)}"
+  }
   args = {
-    CC_VERSION     = pretty(ccver(env))
-    # When cc != dpcpp, we need a oneAPI version to install MKL from.
-    # Note: this is ignored when cc == dpcpp
-    ONEAPI_VERSION = "2025.3"
+    CC_VERSION = pretty(ccver(env))
   }
 }
+
+# ==========================================
+# Source stages
+# ==========================================
 
 target "boost" {
   matrix     = { env = ENV_TARGETS }
@@ -76,7 +95,7 @@ target "boost" {
   name       = "boost-${env}"
   dockerfile = "Dockerfile.boost"
   contexts = {
-    base = "target:base-${env}"
+    base = "target:cc-${env}"
   }
   args = {
     BOOST_BUILD_TOOLSET = cc(env)
@@ -84,7 +103,7 @@ target "boost" {
 }
 
 # ==========================================
-# Final target
+# Final targets
 # ==========================================
 
 target "final" {
@@ -92,19 +111,22 @@ target "final" {
   platforms  = ["linux/amd64"]
   name       = "final-${env}"
   dockerfile = "Dockerfile.final"
+  target     = os(env)
   contexts = {
-    base          = "target:base-${env}"
-    boost-builder = "target:boost-${env}"
+    base  = "target:cc-${env}",
+    boost = "target:boost-${env}"
+  }
+  args = {
+    # If cc is dpcpp, it's mandatory to use the same version for mkl, 
+    # otherwise the usual setvars script would do a mess.
+    # On the other hand, when cc != dpcpp we can pick whatever version we want.
+    ONEAPI_VERSION = cc(env) == "dpcpp" ? pretty(ccver(env)) : "2025.3"
   }
   tags = [
     "${IMAGE}:${pretty(env)}-${VERSION}",
     "${IMAGE}:${pretty(env)}-latest"
   ]
 }
-
-# ==========================================
-# Docs target
-# ==========================================
 
 target "docs" {
   platforms  = ["linux/amd64"]

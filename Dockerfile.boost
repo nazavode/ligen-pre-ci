@@ -4,7 +4,8 @@ ARG BOOST_BUILD_TOOLSET
 ARG BOOST_URL="https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz" 
 ARG BOOST_URL_CHECKSUM_SHA256="f55c340aa49763b1925ccf02b2e83f35fdcf634c9d5164a2acb87540173c741d"
 
-COPY docker-entrypoint.sh /
+# Since we are building sources, we need to transitively enable everything our base provides:
+COPY docker-entrypoint.sh /tmp/
 
 RUN wget -qO /tmp/boost.archive "${BOOST_URL}" \
  && echo "${BOOST_URL_CHECKSUM_SHA256} /tmp/boost.archive" | sha256sum -c - \
@@ -13,7 +14,7 @@ RUN wget -qO /tmp/boost.archive "${BOOST_URL}" \
  && cd /tmp/boost.src \
  && { [ "${BOOST_BUILD_TOOLSET}" != "clang" ] || { export BOOST_CXXFLAGS='-stdlib=libc++' BOOST_LDFLAGS='-stdlib=libc++'; }; } \
  && { [ "${BOOST_BUILD_TOOLSET}" != "dpcpp" ] || export BOOST_BUILD_TOOLSET=gcc; } \
- && . /docker-entrypoint.sh \
+ && . /tmp/docker-entrypoint.sh \
  && ./bootstrap.sh --with-toolset="${BOOST_BUILD_TOOLSET}" --with-libraries=graph,program_options,container \
  && ./b2 -d0 cxxflags="${BOOST_CXXFLAGS}" linkflags="${BOOST_LDFLAGS}" toolset="${BOOST_BUILD_TOOLSET}" cxxstd=20 --with-graph --with-program_options --with-container --prefix=/opt/boost install \
  && rm -rf /tmp/*
