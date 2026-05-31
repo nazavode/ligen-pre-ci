@@ -32,6 +32,8 @@ RUN dnf -y install \
       tar \
       ninja-build \
       cmake \
+      # needed to emit RPMs:
+      rpm-build \
       # needed by gitlab runners:
       git \
       # needed by Intel's own setvars scripts:
